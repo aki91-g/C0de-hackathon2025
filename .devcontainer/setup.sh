@@ -2,115 +2,64 @@
 set -euo pipefail
 
 # =============================================================
-# Devcontainer post-create setup script (repository-aware)
-# - Backend: uv で back/ 用の仮想環境を構築し依存を同期
-# - Frontend: Volta + Corepack + npm で frontend/ を初期化
-# - 何度実行しても安全（冪等）
+# Devcontainer post-create setup script
+# - Backend: uv sync で back/.venv を更新
+# - Frontend: Volta で最新 Node を入れて pnpm install
 # =============================================================
 
 echo "[setup] Start post-create setup..."
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")"/.. && pwd)"
 BACKEND_DIR="$ROOT_DIR/back"
-FRONTEND_DIR="$ROOT_DIR/frontend"
+FRONTEND_DIR="$ROOT_DIR/front"
 
 cd "$ROOT_DIR"
 
 has_cmd() { command -v "$1" >/dev/null 2>&1; }
 
-read_python_requirement() {
-  local pyproject_path="$1"
-  [[ -f "$pyproject_path" ]] || return 0
-  PYPROJECT_PATH="$pyproject_path" python3 - <<'PY' || true
-import os
-import re
-import sys
-try:
-    import tomllib  # Python 3.11+
-except ModuleNotFoundError:
-    sys.exit(0)
-
-path = os.environ.get("PYPROJECT_PATH")
-if not path:
-    sys.exit(0)
-
-with open(path, "rb") as fp:
-    data = tomllib.load(fp)
-
-spec = data.get("project", {}).get("requires-python") or ""
-match = re.search(r"(\d+(?:\.\d+)*)", spec)
-if match:
-    print(match.group(1))
-PY
-}
-
-setup_backend_python() {
-  local pyproject_file="$BACKEND_DIR/pyproject.toml"
-  if [[ ! -f "$pyproject_file" ]]; then
-    echo "[python] back/ に pyproject.toml がありません。スキップします。"
+setup_backend() {
+  if [[ ! -d "$BACKEND_DIR" || ! -f "$BACKEND_DIR/pyproject.toml" ]]; then
+    echo "[python] back/ に pyproject.toml が無いのでスキップします。"
     return 0
   fi
   if ! has_cmd uv; then
-    echo "[python] 'uv' が見つかりません。Dockerfile 経由で導入されている想定です。"
+    echo "[python] uv が見つかりません。Dockerfile で導入されている前提です。"
     return 1
   fi
 
-  echo "[python] backend 仮想環境を準備します..."
-  local required_python
-  required_python="$(read_python_requirement "$pyproject_file" | tr -d '\r')"
-  if [[ -n "$required_python" ]]; then
-    uv python install "$required_python" || true
-  else
-    uv python install 3.12 || true
-  fi
-
-  local venv_dir="$BACKEND_DIR/.venv"
-  if [[ ! -d "$venv_dir" ]]; then
-    uv venv "$venv_dir"
-  fi
-
+  echo "[python] uv sync を実行して仮想環境を整備します..."
   pushd "$BACKEND_DIR" >/dev/null
-  UV_PYTHON="$venv_dir/bin/python" uv sync
-  if [[ -x "$venv_dir/bin/python" ]]; then
-    echo "[python] $( "$venv_dir/bin/python" --version )"
-  fi
+  uv sync
   popd >/dev/null
 }
 
-setup_frontend_node() {
-  local package_json="$FRONTEND_DIR/package.json"
-  if [[ ! -f "$package_json" ]]; then
-    echo "[node] frontend/ に package.json がありません。スキップします。"
+setup_frontend() {
+  if [[ ! -f "$FRONTEND_DIR/package.json" ]]; then
+    echo "[node] frontend/ に package.json が無いのでスキップします。"
     return 0
   fi
   if ! has_cmd volta; then
-    echo "[node] 'volta' が見つかりません。Dockerfile に含まれている想定です。"
+    echo "[node] Volta が見つかりません。Dockerfile で導入されている前提です。"
     return 1
   fi
 
-  echo "[node] frontend を pnpm で初期化します..."
-  volta install node@20 || true
-
-  if has_cmd corepack; then
-    corepack enable || true
-    corepack prepare pnpm@latest --activate || true
-  fi
+  echo "[node] Volta で最新 Node.js をセットアップします..."
+  volta install node@latest || true
   if ! has_cmd pnpm; then
-    npm -g install pnpm || true
+    volta install pnpm@latest || true
   fi
 
   pushd "$FRONTEND_DIR" >/dev/null
   if [[ -f pnpm-lock.yaml ]]; then
     pnpm install --frozen-lockfile
   else
-    echo "[node] pnpm-lock.yaml が無いので新規に生成します。"
     pnpm install
   fi
   echo "[node] Node $(node -v), pnpm $(pnpm -v)"
   popd >/dev/null
 }
 
-setup_backend_python
-setup_frontend_node
+setup_backend
+setup_frontend
 
 echo "[setup] Done."

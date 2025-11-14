@@ -1,3 +1,5 @@
+import BookSearchForm from "./_components/book-search-form";
+
 type GreetingResponse = {
   message: string;
   timestamp: string;
@@ -40,8 +42,10 @@ export default async function Home() {
           </h1>
           <p className="text-lg text-zinc-700 dark:text-zinc-400">
             `front/src/app/page.tsx` ではサーバーコンポーネントから FastAPI
-            のエンドポイントを叩き、取得したメッセージを描画しています。
-            `NEXT_PUBLIC_BACKEND_URL` を変更すれば接続先を差し替えられます。
+            のエンドポイントを叩き、取得したメッセージを描画しています。また、下のフォームから
+            ISBN を送信するとバックエンドが Google Books API を呼び出し、
+            結果をブラウザに返します。`NEXT_PUBLIC_BACKEND_URL`
+            を変更すれば接続先を差し替えられます。
           </p>
         </section>
 
@@ -56,6 +60,8 @@ export default async function Home() {
             受信時刻: {new Date(greeting.timestamp).toLocaleString()}
           </p>
         </section>
+
+        <BookSearchForm backendBaseUrl={BACKEND_BASE_URL} />
 
         <section className="flex flex-col gap-3 text-sm text-zinc-600 dark:text-zinc-400">
           <p>

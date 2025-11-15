@@ -1,4 +1,6 @@
 import BookSearchForm from "./_components/book-search-form";
+import Graph from "./_components/Graph"
+import BookMenu from "./_components/BookMenu"
 
 type GreetingResponse = {
   message: string;
@@ -34,19 +36,10 @@ export default async function Home() {
     <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
       <main className="flex min-h-screen w-full max-w-3xl flex-col gap-10 py-20 px-8 text-black dark:text-zinc-50 sm:px-16">
         <section className="space-y-6">
-          <p className="text-sm uppercase tracking-[0.4em] text-zinc-500">
-            Frontend ↔ Backend
-          </p>
-          <h1 className="text-4xl font-semibold leading-tight">
-            Next.jsとFastAPIが繋がっています
-          </h1>
-          <p className="text-lg text-zinc-700 dark:text-zinc-400">
-            `front/src/app/page.tsx` ではサーバーコンポーネントから FastAPI
-            のエンドポイントを叩き、取得したメッセージを描画しています。また、下のフォームから
-            ISBN を送信するとバックエンドが Google Books API を呼び出し、
-            結果をブラウザに返します。`NEXT_PUBLIC_BACKEND_URL`
-            を変更すれば接続先を差し替えられます。
-          </p>
+          <Graph />
+          <BookMenu prop="store" />
+          <BookMenu prop="reserve" />
+          <BookMenu prop="read" />
         </section>
 
         <section className="rounded-2xl border border-zinc-200 bg-white p-8 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">

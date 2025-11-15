@@ -1,4 +1,5 @@
 import BookSearchForm from "./_components/book-search-form";
+import JanReader from "./_components/jan-reader";
 
 type GreetingResponse = {
   message: string;
@@ -61,6 +62,7 @@ export default async function Home() {
           </p>
         </section>
 
+        <JanReader />
         <BookSearchForm backendBaseUrl={BACKEND_BASE_URL} />
 
         <section className="flex flex-col gap-3 text-sm text-zinc-600 dark:text-zinc-400">

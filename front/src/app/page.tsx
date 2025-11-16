@@ -1,7 +1,6 @@
 import BookSearchForm from "./_components/book-search-form";
 import Graph from "./_components/Graph"
 import BookMenu from "./_components/BookMenu"
-import BarcodeReader from "./_components/BarcodeReader";
 import FabMenu from "./_components/CameraButton";
 
 type GreetingResponse = {
@@ -44,9 +43,6 @@ export default async function Home() {
           <BookMenu prop="store" />
           <BookMenu prop="reserve" />
           <BookMenu prop="read" />
-        </section>
-        <section className="space-y-6">
-          <BarcodeReader/>
         </section>
 
         <section className="rounded-2xl border border-zinc-200 bg-white p-8 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">

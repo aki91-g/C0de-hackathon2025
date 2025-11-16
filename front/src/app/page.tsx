@@ -2,6 +2,7 @@ import BookSearchForm from "./_components/book-search-form";
 import Graph from "./_components/Graph"
 import BookMenu from "./_components/BookMenu"
 import BarcodeReader from "./_components/BarcodeReader";
+import FabMenu from "./_components/CameraButton";
 
 type GreetingResponse = {
   message: string;
@@ -36,6 +37,8 @@ export default async function Home() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
       <main className="flex min-h-screen w-full max-w-3xl flex-col gap-10 py-20 px-8 text-black dark:text-zinc-50 sm:px-16">
+        <FabMenu />
+        
         <section className="space-y-6">
           <Graph />
           <BookMenu prop="store" />

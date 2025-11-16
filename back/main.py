@@ -1,14 +1,18 @@
 from __future__ import annotations
-
 import os
+import uvicorn
+from typing import List
 from datetime import datetime, timezone
 
+
 from fastapi import FastAPI
+from fastapi import Depends, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
-import uvicorn
+from sqlalchemy.orm import Session
 
 from app.api.endpoints import books
+from app.db import database, models
 
 app = FastAPI(title="C0de Hackathon Backend")
 
@@ -19,7 +23,55 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+### app/api/endpoints/books.py - 書籍情報APIのエンドポイント
 app.include_router(books.router, prefix="/books", tags=["books"])
+
+
+### app//db/database.py - データベース接続とモデル定義
+@app.post("/books/", response_model=models.Book)
+def create_book(book: models.BookCreate, db: Session = Depends(database.get_db)):
+    db_book = database.Book(**book.dict())
+    db.add(db_book)
+    db.commit()
+    db.refresh(db_book)
+    return db_book
+
+# すべての書籍取得
+@app.get("/books/", response_model=List[models.Book])
+def read_books(skip: int = 0, limit: int = 100, db: Session = Depends(database.get_db)):
+    books = db.query(database.Book).offset(skip).limit(limit).all()
+    return books
+
+# 特定の書籍取得
+@app.get("/books/{book_id}", response_model=models.Book)
+def read_book(book_id: int, db: Session = Depends(database.get_db)):
+    book = db.query(database.Book).filter(database.Book.id == book_id).first()
+    if book is None:
+        raise HTTPException(status_code=404, detail="Book not found")
+    return book
+
+@app.put("/books/{book_id}", response_model=models.Book)
+def update_book(book_id: int, book: models.BookUpdate, db: Session = Depends(database.get_db)):
+    db_book = db.query(database.Book).filter(database.Book.id == book_id).first()
+    if db_book is None:
+        raise HTTPException(status_code=404, detail="Book not found")
+    for key, value in book.dict().items():
+        setattr(db_book, key, value)
+    db.commit()
+    db.refresh(db_book)
+    return db_book
+
+@app.delete("/books/{book_id}", response_model=models.Book)
+def delete_book(book_id: int, db: Session = Depends(database.get_db)):
+    book = db.query(database.Book).filter(database.Book.id == book_id).first()
+    if book is None:
+        raise HTTPException(status_code=404, detail="Book not found")
+    db.delete(book)
+    db.commit()
+    return book
+
+
+
 
 
 @app.get("/api/health")

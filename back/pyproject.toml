@@ -11,4 +11,6 @@ dependencies = [
     "pydantic>=2.9.2",
     "httpx>=0.27.2",
     "python-dotenv>=1.2.1",
+    "sqlalchemy>=2.0.44",
+    "psycopg2-binary>=2.9.11",
 ]

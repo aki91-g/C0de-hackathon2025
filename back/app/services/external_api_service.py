@@ -1,14 +1,14 @@
-# app/services/book_service.py - 外部API連携とデータマッピングロジック 
+# app/services/external_api_service.py - 外部API連携とデータマッピングロジック 
 # 動作確認：http://localhost:3000/api/books/
 
 import httpx
 import os
 import xml.etree.ElementTree as ET
-from typing import Optional
-from dotenv import load_dotenv
-from app.models.book import BookInfo
 import asyncio
 import logging
+from typing import Optional
+from dotenv import load_dotenv
+from models.external_book import BookInfo
 
 logger = logging.getLogger(__name__)
 

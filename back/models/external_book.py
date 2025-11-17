@@ -1,4 +1,4 @@
-# app/models/book.py - 書籍モデルの定義 
+# models/external_book.py - 書籍モデルの定義 
 
 from typing import Optional
 from pydantic import BaseModel

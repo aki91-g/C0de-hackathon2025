@@ -34,14 +34,10 @@ def read_book(book_id: int, session: Session = Depends(db.get_db)):
 # 更新
 @router.put("/{book_id}", response_model=schema.Book)
 def update_book(book_id: int, book: schema.BookUpdate, session: Session = Depends(db.get_db)):
-    db_book = session.query(db.Book).filter(db.Book.id == book_id).first()
-    if db_book is None:
+    updated_book = db_service.update_book_details(session, book_id, book) 
+    if updated_book is None:
         raise HTTPException(status_code=404, detail="Book not found")
-    for key, value in book.dict().items():
-        setattr(db_book, key, value)
-    session.commit()
-    session.refresh(db_book)
-    return db_book
+    return updated_book
 
 # 削除
 @router.delete("/{book_id}", response_model=schema.Book)

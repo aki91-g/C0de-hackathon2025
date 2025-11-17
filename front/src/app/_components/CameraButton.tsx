@@ -9,7 +9,7 @@ export default function FabMenu() {
   const router = useRouter();
 
   return (
-    <div className="fixed bottom-6 right-6 flex flex-col items-end space-y-3">
+    <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end space-y-3">
       {/* メニュー1 */}
       {open && (
         <button

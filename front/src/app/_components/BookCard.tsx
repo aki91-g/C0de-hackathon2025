@@ -5,7 +5,7 @@ export default function BookCard({ book, onClick }: any) {
       onClick={onClick}
     >
       <div className="w-full h-32 bg-gray-200 flex items-center justify-center text-sm">
-        {book.image}
+        NO IMAGE
       </div>
       <div className="mt-2 text-center font-medium">{book.title}</div>
     </div>

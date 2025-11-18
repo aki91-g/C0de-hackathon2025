@@ -3,6 +3,7 @@
 import Image from "next/image";
 import type { Book } from "@/types/book"
 import { useState } from "react";
+import  AutoFitText  from "./AutoFitText"
 
 export default function BookCard({ book, onClick }: { book: Book, onClick: any }) {
   const [hasError, setHasError] = useState(false);
@@ -12,14 +13,17 @@ export default function BookCard({ book, onClick }: { book: Book, onClick: any }
       className="border rounded-lg p-3 shadow hover:bg-gray-100 cursor-pointer"
       onClick={onClick}
     >
-      {!hasError ? 
-        <Image src={book.cover_image_url} alt="image" width={200} height={200} onError={() => setHasError(true)} className="object-cover rounded"/>
+      {book.cover_image_url && !hasError ? 
+        <div className="w-full h-40 flex items-center justify-center">
+          <Image src={book.cover_image_url} alt="image" width={800} height={800} onError={() => setHasError(true)} 
+            className="object-contain max-h-40 rounded"/>
+        </div>
          :
-        <div className="w-full h-32 bg-gray-200 flex items-center justify-center text-sm">
+        <div className="w-full h-40 bg-gray-200 flex items-center justify-center text-sm">
           NO IMAGE
         </div>
       }
-      <div className="mt-2 text-center font-medium">{book.title}</div>
+      <AutoFitText text={book.title} />
     </div>
   );
 }

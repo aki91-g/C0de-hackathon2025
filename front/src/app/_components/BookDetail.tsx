@@ -19,10 +19,10 @@ export default function BookDetailDialog({ book, onClose }: { book: Book, onClos
 
         <div className="space-y-4">
           {/* 画像 */}
-          {!hasError ? 
+          {book.cover_image_url && !hasError ? 
             <div className="w-full h-40 flex items-center justify-center">
               <Image src={book.cover_image_url} alt="image" width={800} height={800} onError={() => setHasError(true)} 
-                className="object-contain max-h-48"/>
+                className="object-contain max-h-44"/>
             </div>
               :
             <div className="w-full h-40 bg-gray-200 flex items-center justify-center">

@@ -1,36 +1,36 @@
-import BookSearchForm from "./_components/book-search-form";
+// import BookSearchForm from "./_components/book-search-form";
 import Graph from "./_components/Graph"
 import BookMenu from "./_components/BookMenu"
 import BarcodeReader from "./_components/BarcodeReader";
 import FabMenu from "./_components/CameraButton";
 import type { Book } from "@/types/book";
 
-type GreetingResponse = {
-  message: string;
-  timestamp: string;
-};
+// type GreetingResponse = {
+//   message: string;
+//   timestamp: string;
+// };
 
 const BACKEND_BASE_URL =
   process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://127.0.0.1:8000";
 
-async function getGreeting(): Promise<GreetingResponse> {
-  try {
-    const response = await fetch(`${BACKEND_BASE_URL}/api/greeting`, {
-      cache: "no-store",
-    });
+// async function getGreeting(): Promise<GreetingResponse> {
+//   try {
+//     const response = await fetch(`${BACKEND_BASE_URL}/api/greeting`, {
+//       cache: "no-store",
+//     });
 
-    if (!response.ok) {
-      throw new Error(`Backend responded with ${response.status}`);
-    }
+//     if (!response.ok) {
+//       throw new Error(`Backend responded with ${response.status}`);
+//     }
 
-    return (await response.json()) as GreetingResponse;
-  } catch {
-    return {
-      message: "Backend APIに接続できませんでした。",
-      timestamp: new Date().toISOString(),
-    };
-  }
-}
+//     return (await response.json()) as GreetingResponse;
+//   } catch {
+//     return {
+//       message: "Backend APIに接続できませんでした。",
+//       timestamp: new Date().toISOString(),
+//     };
+//   }
+// }
 
 async function getBooks(): Promise<Book[]> {
   try {
@@ -49,7 +49,7 @@ async function getBooks(): Promise<Book[]> {
 }
 
 export default async function Home() {
-  const greeting = await getGreeting();
+  // const greeting = await getGreeting();
   const books = await getBooks();
 
   return (
@@ -67,7 +67,7 @@ export default async function Home() {
           <BarcodeReader/>
         </section>
 
-        <section className="rounded-2xl border border-zinc-200 bg-white p-8 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+        {/* <section className="rounded-2xl border border-zinc-200 bg-white p-8 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
           <h2 className="text-xl font-medium text-zinc-900 dark:text-zinc-50">
             最新のバックエンドレスポンス
           </h2>
@@ -91,7 +91,7 @@ export default async function Home() {
           </p>
           <p>2. `cd front && npm run dev` でフロントエンドを起動</p>
           <p>3. ブラウザで http://localhost:3000 を開いて動作確認</p>
-        </section>
+        </section> */}
       </main>
     </div>
   );

@@ -3,6 +3,7 @@ import Graph from "./_components/Graph"
 import BookMenu from "./_components/BookMenu"
 import BarcodeReader from "./_components/BarcodeReader";
 import FabMenu from "./_components/CameraButton";
+import type { Book } from "@/types/book";
 
 type GreetingResponse = {
   message: string;
@@ -31,8 +32,25 @@ async function getGreeting(): Promise<GreetingResponse> {
   }
 }
 
+async function getBooks(): Promise<Book[]> {
+  try {
+    const response = await fetch(`${BACKEND_BASE_URL}/books/`, {
+      method: "GET",
+    });
+
+    if (!response.ok) {
+      throw new Error(`Backend responded with ${response.status}`);
+    }
+
+    return (await response.json()) as Book[]
+  } catch {
+    return [];
+  }
+}
+
 export default async function Home() {
   const greeting = await getGreeting();
+  const books = await getBooks();
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
@@ -41,9 +59,9 @@ export default async function Home() {
         
         <section className="space-y-6">
           <Graph />
-          <BookMenu prop="store" />
-          <BookMenu prop="reserve" />
-          <BookMenu prop="read" />
+          <BookMenu prop="store" books={books} />
+          <BookMenu prop="reserve" books={books}/>
+          <BookMenu prop="read" books={books}/>
         </section>
         <section className="space-y-6">
           <BarcodeReader/>

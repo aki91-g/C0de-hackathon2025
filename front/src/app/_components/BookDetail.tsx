@@ -3,9 +3,12 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useState } from "react";
 import { Textarea } from "@/components/ui/textarea";
+import Image from "next/image";
+import type { Book } from "@/types/book"
 
-export default function BookDetailDialog({ book, onClose }: any) {
+export default function BookDetailDialog({ book, onClose }: { book: Book, onClose: any }) {
   const [memo, setMemo] = useState("");
+  const [hasError, setHasError] = useState(false);
 
   return (
     <Dialog open={true} onOpenChange={onClose}>
@@ -15,10 +18,17 @@ export default function BookDetailDialog({ book, onClose }: any) {
         </DialogHeader>
 
         <div className="space-y-4">
-          {/* 画像（現状 NO IMAGE） */}
-          <div className="w-full h-40 bg-gray-200 flex items-center justify-center">
-            {book.image}
-          </div>
+          {/* 画像 */}
+          {!hasError ? 
+            <div className="w-full h-40 flex items-center justify-center">
+              <Image src={book.cover_image_url} alt="image" width={800} height={800} onError={() => setHasError(true)} 
+                className="object-contain max-h-48"/>
+            </div>
+              :
+            <div className="w-full h-40 bg-gray-200 flex items-center justify-center">
+              NO IMAGE
+            </div>
+          }
 
           {/* あらすじ */}
           <div>

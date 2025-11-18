@@ -1,4 +1,4 @@
-# models/db.py
+# database/models/book_model.py
 
 from datetime import datetime, timezone
 from sqlalchemy.ext.declarative import declarative_base 

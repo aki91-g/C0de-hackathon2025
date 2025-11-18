@@ -6,8 +6,8 @@ from sqlalchemy.orm import Session, sessionmaker
 from datetime import datetime, timezone
 from typing import Optional, Generator, Any
 
-from models.db import Books 
-from models.schema import BookUpdate, BookStatus
+from back.database.models.book_model import Books 
+from back.app.schemas.books import BookUpdate, BookStatus
 from back.app.services.external_api_service import BookInfo
 
 

@@ -1,4 +1,4 @@
-# models/schema.py
+# app/schemas/books.py
 
 from enum import Enum
 from datetime import datetime, timezone

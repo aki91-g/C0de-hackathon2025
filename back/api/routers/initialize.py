@@ -1,9 +1,10 @@
-# api/endpoints/initialize.py データベースの初期化
+# api/routers/initialize.py データベースの初期化
 
+from back.database.models import book_model
 from fastapi import APIRouter, HTTPException, Depends, Query
 from sqlalchemy.orm import Session
-from back.models import db
-from back.app.services import db_service, external_api_service
+from back.database import connection
+from back.app.services import external_api_service
 
 router = APIRouter()
 
@@ -39,8 +40,8 @@ TEST_ISBNs = [
 )
 async def initialize_database(
     confirm: bool = Query(..., description="Set to **True** to proceed."),
-    db_engine: any = Depends(db_service.get_engine),
-    db_session: Session = Depends(db_service.get_db) # New dependency for inserting data
+    db_engine: any = Depends(connection.get_engine),
+    db_session: Session = Depends(connection.get_db) # New dependency for inserting data
 ):
     if not confirm:
         raise HTTPException(
@@ -49,8 +50,8 @@ async def initialize_database(
         )
 
     try:
-        db.Base.metadata.drop_all(bind=db_engine)
-        db.Base.metadata.create_all(bind=db_engine)
+        book_model.Base.metadata.drop_all(bind=db_engine)
+        book_model.Base.metadata.create_all(bind=db_engine)
         
         inserted_count = 0
         failed_isbns = []
@@ -59,7 +60,7 @@ async def initialize_database(
             book_info = await external_api_service.get_book_info(isbn)
             
             if book_info:
-                db_service.create_book(db_session, book_info)
+                connection.create_book(db_session, book_info)
                 inserted_count += 1
             else:
                 failed_isbns.append(isbn)

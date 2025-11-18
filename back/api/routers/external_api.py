@@ -1,4 +1,4 @@
-# app/api/endpoints/books.py - 書籍情報APIのエンドポイント
+# api/routers/books.py - 書籍情報APIのエンドポイント
 
 from fastapi import APIRouter, HTTPException
 from typing import Optional

@@ -1,5 +1,4 @@
 # app/services/external_api_service.py - 外部API連携とデータマッピングロジック 
-# 動作確認：http://localhost:3000/api/books/
 
 import httpx
 import os
@@ -8,7 +7,7 @@ import asyncio
 import logging
 from typing import Optional
 from dotenv import load_dotenv
-from models.external_book import BookInfo
+from back.app.schemas.external_books import BookInfo
 
 logger = logging.getLogger(__name__)
 
@@ -132,7 +131,6 @@ async def fetch_book_from_ndl(isbn: str) -> Optional[BookInfo]:
     except Exception as e:
         logger.error(f"NDL Search: Unexpected error for ISBN {isbn}: {e}")
         return None
-
 
 
 async def get_book_info(isbn: str) -> Optional[BookInfo]:

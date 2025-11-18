@@ -1,21 +1,62 @@
 # app/services/db_service.py
 
-from sqlalchemy.orm import Session
+import os
+from sqlalchemy import create_engine
+from sqlalchemy.orm import Session, sessionmaker
 from datetime import datetime, timezone
-from typing import Optional
+from typing import Optional, Generator, Any
 
-from models.db import Book 
+from models.db import Books 
 from models.schema import BookUpdate, BookStatus
+from back.app.services.external_api_service import BookInfo
+
+
+DATABASE_URL = os.getenv("DATABASE_URL")
+engine = create_engine(DATABASE_URL)
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+
+def get_db() -> Generator[Session, None, None]:
+    """Dependency function to yield a new database session."""
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
+def get_engine() -> Any:
+    """Dependency function to get the SQLAlchemy engine."""
+    return engine
+
+def create_book(db: Session, book_data: BookInfo) -> Books:
+    """
+    Creates a new Books record from the external BookInfo model,
+    filling in default values for local-only fields.
+    """
+    db_book = Books(
+        title=book_data.title,
+        author=book_data.author,
+        isbn=book_data.isbn,
+        cover_image_url=book_data.cover_image_url,
+        description="Book details fetched from external source.", 
+        status="store",
+    )
+
+    db.add(db_book)
+    db.commit()
+    db.refresh(db_book)
+    return db_book
+
 
 def get_utcnow_aware() -> datetime:
     """Helper function to get current timezone-aware UTC time."""
     return datetime.now(timezone.utc)
 
-def update_book_details(db: Session, book_id: int, update_data: BookUpdate) -> Optional[Book]:
+def update_book_details(db: Session, book_id: int, update_data: BookUpdate) -> Optional[Books]:
     """
     Updates book details, conditionally setting status_changed_at only if the status itself changes.
     """
-    db_book = db.query(Book).filter(Book.id == book_id).first()
+    db_book = db.query(Books).filter(Books.id == book_id).first()
     if not db_book:
         return None
 
@@ -39,3 +80,4 @@ def update_book_details(db: Session, book_id: int, update_data: BookUpdate) -> O
     db.commit()
     db.refresh(db_book)
     return db_book
+

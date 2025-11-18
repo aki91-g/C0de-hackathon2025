@@ -10,8 +10,8 @@ router = APIRouter()
 
 # 登録
 @router.post("/", response_model=schema.Book)
-def create_book(book: schema.BookCreate, session: Session = Depends(db.get_db)):
-    db_book = db.Book(**book.model_dump())
+def create_book(book: schema.BookCreate, session: Session = Depends(db_service.get_db)):
+    db_book = db.Books(**book.model_dump())
     session.add(db_book)
     session.commit()
     session.refresh(db_book)
@@ -19,21 +19,21 @@ def create_book(book: schema.BookCreate, session: Session = Depends(db.get_db)):
 
 # すべての書籍取得
 @router.get("/", response_model=List[schema.Book])
-def read_books(skip: int = 0, limit: int = 100, session: Session = Depends(db.get_db)):
-    books = session.query(db.Book).offset(skip).limit(limit).all()
+def read_books(skip: int = 0, limit: int = 100, session: Session = Depends(db_service.get_db)):
+    books = session.query(db.Books).offset(skip).limit(limit).all()
     return books
 
 # 特定の書籍取得
 @router.get("/{book_id}", response_model=schema.Book)
-def read_book(book_id: int, session: Session = Depends(db.get_db)):
-    book = session.query(db.Book).filter(db.Book.id == book_id).first()
+def read_book(book_id: int, session: Session = Depends(db_service.get_db)):
+    book = session.query(db.Books).filter(db.Books.id == book_id).first()
     if book is None:
         raise HTTPException(status_code=404, detail="Book not found")
     return book
 
 # 更新
 @router.put("/{book_id}", response_model=schema.Book)
-def update_book(book_id: int, book: schema.BookUpdate, session: Session = Depends(db.get_db)):
+def update_book(book_id: int, book: schema.BookUpdate, session: Session = Depends(db_service.get_db)):
     updated_book = db_service.update_book_details(session, book_id, book) 
     if updated_book is None:
         raise HTTPException(status_code=404, detail="Book not found")
@@ -41,8 +41,8 @@ def update_book(book_id: int, book: schema.BookUpdate, session: Session = Depend
 
 # 削除
 @router.delete("/{book_id}", response_model=schema.Book)
-def delete_book(book_id: int, session: Session = Depends(db.get_db)):
-    book = session.query(db.Book).filter(db.Book.id == book_id).first()
+def delete_book(book_id: int, session: Session = Depends(db_service.get_db)):
+    book = session.query(db.Books).filter(db.Books.id == book_id).first()
     if book is None:
         raise HTTPException(status_code=404, detail="Book not found")
     session.delete(book)

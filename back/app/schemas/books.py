@@ -5,9 +5,6 @@ from datetime import datetime, timezone
 from pydantic import BaseModel, ConfigDict, Field
 from typing import Optional
 
-def get_utcnow_aware() -> datetime:
-    """Returns the current timezone-aware datetime in UTC."""
-    return datetime.now(timezone.utc)
 
 class BookStatus(str, Enum):
     STORE = 'store'
@@ -20,15 +17,17 @@ class BookBase(BaseModel):
     isbn: str
     cover_image_url: Optional[str] = None
     description: Optional[str] = None
-    status: BookStatus = BookStatus.STORE   
-    last_modified: datetime = Field(default_factory=get_utcnow_aware)
-    status_changed_at: datetime = Field(default_factory=get_utcnow_aware)
+    status: BookStatus = BookStatus.STORE 
+    last_modified: datetime = Field(default_factory=datetime.now(timezone.utc))
+    created_at: datetime = Field(default_factory=datetime.now(timezone.utc))
+    status_reserve_at: datetime | None = Field(default=None)
+    status_read_at: datetime | None = Field(default=None)
 
 class BookCreate(BookBase):
     pass
 
-class BookUpdate(BookBase):
-    pass
+# class BookUpdate(BookBase):
+#     pass
 
 class BookStatusUpdate(BaseModel):
     status: BookStatus

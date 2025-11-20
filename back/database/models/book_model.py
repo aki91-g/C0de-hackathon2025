@@ -6,10 +6,6 @@ from sqlalchemy import Column, Integer, String, DateTime
 
 Base = declarative_base()
 
-def utcnow_aware_default() -> datetime:
-    """Returns the current timezone-aware datetime in UTC."""
-    return datetime.now(timezone.utc)
-
 class Books(Base):
     __tablename__ = "books"
 
@@ -26,13 +22,23 @@ class Books(Base):
     )
     last_modified = Column(
         DateTime(timezone=True),
-        default=utcnow_aware_default,
+        default=datetime.now(timezone.utc),
         nullable=False
     )
-    status_changed_at = Column(
+    created_at = Column(
         DateTime(timezone=True),
-        default=utcnow_aware_default,
+        default=datetime.now(timezone.utc),
         nullable=False
+    )
+    status_reserve_at = Column(
+        DateTime(timezone=True),
+        default=None,
+        nullable=True
+    )
+    status_read_at = Column(
+        DateTime(timezone=True),
+        default=None,
+        nullable=True
     )
 
 

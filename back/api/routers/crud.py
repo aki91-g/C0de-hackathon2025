@@ -1,12 +1,14 @@
 # api/routers/books.py
 
 from back.app.schemas import books
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException, Depends, status
 from typing import Optional, List
 from sqlalchemy.orm import Session
 from back.database import connection
 from back.database.models import book_model
-from back.app.services.crud_service import update_book_details, update_book_status
+from back.app.services.crud_service import update_book_details, update_book_status, create_book_from_external
+from back.app.services import external_api_service, initialize_service
+from typing import Annotated
 
 router = APIRouter()
 
@@ -18,6 +20,19 @@ def create_book(book: books.BookCreate, session: Session = Depends(connection.ge
     session.commit()
     session.refresh(db_book)
     return db_book
+
+# 自動登録
+@router.post("/external/{isbn}", response_model=books.Book)
+async def auto_create_book_by_isbn(
+    isbn: str,
+    session: Session = Depends(connection.get_db)
+):
+    db_book = await create_book_from_external(session, isbn)   
+    session.add(db_book)
+    session.commit()
+    session.refresh(db_book)
+    return db_book
+
 
 # すべての書籍取得
 @router.get("/", response_model=List[books.Book])

@@ -4,6 +4,7 @@ from fastapi import APIRouter, HTTPException
 from typing import Optional
 from back.app.services import external_api_service
 
+
 router = APIRouter()
 
 @router.get("/{isbn}", response_model=Optional[external_api_service.BookExternalInfo])

@@ -41,7 +41,7 @@ TEST_ISBNs = [
 async def initialize_database(
     confirm: bool = Query(..., description="Set to **True** to proceed."),
     db_engine: any = Depends(connection.get_engine),
-    db_session: Session = Depends(connection.get_db) # New dependency for inserting data
+    db_session: Session = Depends(connection.get_db)
 ):
     if not confirm:
         raise HTTPException(

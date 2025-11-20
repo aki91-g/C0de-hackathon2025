@@ -31,7 +31,7 @@ app.include_router(crud.router, prefix="/books", tags=["books"])
 app.include_router(initialize.router, prefix="/initialize", tags=["initialize"])
 
 ### app/endpoints/initialize.py ステータスカウント取得エンドポイント
-app.include_router(status.router, prefix="/status/count", tags=["status count"])
+app.include_router(status.router, prefix="/status", tags=["status"])
 
 @app.get("/api/health")
 def health() -> dict[str, str]:

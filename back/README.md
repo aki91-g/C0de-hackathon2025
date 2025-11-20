@@ -121,11 +121,12 @@ GOOGLE BOOKS APIや国立国会図書館サーチAPI (SRU)からデータを取�
 **編集するファイル**
 - `app/services/external_api_service.py` <br>
 主に編集するファイル。外部APIとの連携を行う。<p>
-- `app/schemas/external_books.py` <br>
+- `app/schemas/books.py` <br>
 取得するデータの形式を更新する場合に編集するファイル。<br>
 **(注)**<br>
 スキーマを更新したいときは、他のスキーマと連携させるため、更新内容を共有してください。できるだけ早く対応します。<br>
 <small>余裕があれば、READMEに形式を追記しておいてくれると、助かります。（書き方については、このREADME上部、初期化エンドポイント部分参照）</small>
+
 
 
 

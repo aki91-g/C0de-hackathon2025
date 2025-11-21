@@ -22,22 +22,17 @@ def create_book(book: books.BookCreate, session: Session = Depends(connection.ge
     return db_book
 
 
-# 自動登録(店)
+# 自動登録(店) - Reserve Status
 @router.post("/external/reserve/{isbn}", response_model=books.Book)
-async def auto_create_book_by_isbn(isbn: str, session: Session = Depends(connection.get_db)):
-    db_book = await create_book_from_external_reserve(session, isbn)   
-    session.add(db_book)
-    session.commit()
-    session.refresh(db_book)
+async def create_reserve_book_by_isbn(isbn: str, session: Session = Depends(connection.get_db)): # FIX: Renamed function
+    db_book = await create_book_from_external_reserve(session, isbn) 
+    
     return db_book
 
 # 自動登録(家)
 @router.post("/external/store/{isbn}", response_model=books.Book)
-async def auto_create_book_by_isbn(isbn: str, session: Session = Depends(connection.get_db)):
-    db_book = await create_book_from_external_reserve(session, isbn)   
-    session.add(db_book)
-    session.commit()
-    session.refresh(db_book)
+async def create_store_book_by_isbn(isbn: str, session: Session = Depends(connection.get_db)): # FIX: Renamed function
+    db_book = await create_book_from_external_store(session, isbn) 
     return db_book
 
 # すべての書籍取得

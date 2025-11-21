@@ -2,7 +2,7 @@
 
 from enum import Enum
 from datetime import datetime, timezone
-from pydantic import BaseModel, ConfigDict, Field, PositiveInt
+from pydantic import BaseModel, ConfigDict, Field, NonNegativeInt
 from typing import Optional
 
 
@@ -16,7 +16,7 @@ class BookBase(BaseModel):
     author: str
     isbn: str
     cover_image_url: Optional[str] = None
-    cost: Optional[PositiveInt] = 0
+    cost: Optional[NonNegativeInt] = 0
     description: Optional[str] = None
     status: BookStatus = BookStatus.RESERVE 
     last_modified: datetime = Field(default_factory=datetime.now(timezone.utc))
@@ -31,7 +31,7 @@ class BookStatusUpdate(BaseModel):
     status: BookStatus
 
 class BookCostUpdate(BaseModel):
-    cost: PositiveInt
+    cost: NonNegativeInt
 
 class Book(BookBase):
     id: int

@@ -14,7 +14,7 @@ class Books(Base):
     author = Column(String)
     isbn = Column(String, unique=True, index=True)
     cover_image_url = Column(String)
-    cost = Column(Integer)
+    cost = Column(Integer, default = 0)
     description = Column(String, nullable=True)
     status = Column(
         String,

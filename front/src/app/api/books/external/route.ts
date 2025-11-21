@@ -14,7 +14,7 @@ export async function POST(request: NextRequest) {
         })
 
         if (!response.ok) {
-            return NextResponse.json({ error: 'Failed to register book' }, { status: 500 });
+            return NextResponse.json({ error: 'Failed to register book' }, { status: response.status });
         }
 
         return NextResponse.json({ message: 'Book registered successfully' }, { status: 200 });

@@ -17,9 +17,9 @@ class BookBase(BaseModel):
     isbn: str
     cover_image_url: Optional[str] = None
     description: Optional[str] = None
-    status: BookStatus = BookStatus.STORE 
+    status: BookStatus = BookStatus.RESERVE 
     last_modified: datetime = Field(default_factory=datetime.now(timezone.utc))
-    status_reserve_at: datetime | None = Field(default=None)
+    status_reserve_at: datetime = Field(default_factory=datetime.now(timezone.utc))
     status_store_at : datetime | None = Field(default=None)
     status_read_at: datetime | None = Field(default=None)
 

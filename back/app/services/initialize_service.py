@@ -16,7 +16,7 @@ def create_book(db: Session, book_data: BookExternalInfo) -> Books:
         isbn=book_data.isbn,
         cover_image_url=book_data.cover_image_url,
         description="Book details fetched from external source.", 
-        status="store",
+        status="reserve",
     )
 
     db.add(db_book)

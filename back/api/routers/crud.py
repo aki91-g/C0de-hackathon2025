@@ -1,14 +1,14 @@
 # api/routers/books.py
 
-from back.app.schemas import books
+from datetime import datetime, timezone
 from fastapi import APIRouter, HTTPException, Depends, status
 from typing import Optional, List
 from sqlalchemy.orm import Session
+from back.app.schemas import books
 from back.database import connection
 from back.database.models import book_model
 from back.app.services.crud_service import update_book_status, create_book_from_external_reserve, create_book_from_external_store
 from back.app.services import external_api_service, initialize_service
-from typing import Annotated
 
 router = APIRouter()
 
@@ -49,7 +49,20 @@ def read_book(book_id: int, session: Session = Depends(connection.get_db)):
         raise HTTPException(status_code=404, detail="Book not found")
     return book
 
-# ステータスのみを更新 
+
+# 金額を更新 
+@router.patch("/{book_id}/cost", response_model=books.Book)
+def update_book_detail_cost(book_id: int, cost_update: books.BookCostUpdate, session: Session = Depends(connection.get_db)):
+    updated_book = session.query(books.Books).filter(books.Books.id == book_id).first()
+    if updated_book is None:
+        raise HTTPException(status_code=404, detail="Book not found")
+    updated_book.cost = cost_update.cost
+    updated_book.last_modified = datetime.now(timezone.utc)
+    session.commit()
+    session.refresh(updated_book)
+    return updated_book
+
+# ステータスを更新 
 @router.patch("/{book_id}/status", response_model=books.Book) 
 def update_book_detail_status(book_id: int, status_update: books.BookStatusUpdate, session: Session = Depends(connection.get_db)):
     new_status_value = status_update.status.value

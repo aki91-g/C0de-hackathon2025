@@ -177,6 +177,7 @@ export default function BarcodeReader({bookRegisterMode}: BarcodeReaderProps) {
             confirmText={modalConfirmText}
         ></Modal>
         <video ref={videoRef} className="w-full"/>
+        {/* ここから Test 用コードです*/}
         <button onClick={() => {
             setISBNText("9784087700039");
         }} className="mt-4 px-4 py-2 bg-blue-500 text-white rounded">
@@ -192,6 +193,7 @@ export default function BarcodeReader({bookRegisterMode}: BarcodeReaderProps) {
         }} className="mt-4 px-4 py-2 bg-blue-500 text-white rounded">
             バーコード読み取りテスト（シャーロックホームズ 緋色の研究）
         </button>
+        {/* ここまで Test 用コードです*/}
     </>
     );
 }

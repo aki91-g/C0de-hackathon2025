@@ -178,9 +178,19 @@ export default function BarcodeReader({bookRegisterMode}: BarcodeReaderProps) {
         ></Modal>
         <video ref={videoRef} className="w-full"/>
         <button onClick={() => {
+            setISBNText("9784087700039");
+        }} className="mt-4 px-4 py-2 bg-blue-500 text-white rounded">
+            バーコード読み取りテスト（森羅記）
+        </button>
+                <button onClick={() => {
+            setISBNText("9784061595842");
+        }} className="mt-4 px-4 py-2 bg-blue-500 text-white rounded">
+            バーコード読み取りテスト（明治維新）
+        </button>
+                <button onClick={() => {
             setISBNText("9784102134054");
         }} className="mt-4 px-4 py-2 bg-blue-500 text-white rounded">
-            バーコード読み取りテスト
+            バーコード読み取りテスト（シャーロックホームズ 緋色の研究）
         </button>
     </>
     );

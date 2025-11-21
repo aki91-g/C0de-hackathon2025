@@ -49,15 +49,15 @@ def create_book(db: Session, book_data: BookExternalInfo) -> Books:
             read_at = store_at + timedelta(seconds=random_seconds_after_store)
 
     last_modified = read_at or store_at or reserve_at
+    random_cost = random.randint(1, 6)*1000
 
-    
     db_book = Books(
         title=book_data.title,
         author=book_data.author,
         isbn=book_data.isbn,
         cover_image_url=book_data.cover_image_url,
+        cost = random_cost,
         description="Book details fetched for initialization.", 
-
         status=final_status,
         status_reserve_at=reserve_at,
         status_store_at=store_at,

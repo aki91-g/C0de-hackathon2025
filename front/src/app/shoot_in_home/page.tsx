@@ -15,7 +15,7 @@ export default async function ShootInHome() {
                     className="w-14 h-14 flex items-center justify-center rounded-full bg-gray-500 text-white shadow-xl hover:bg-blue-700 transition"
                 > <CornerDownLeft size={32} /> </button>
             </div>
-            <BarcodeReader/>
+            <BarcodeReader bookRegisterMode="reserve"/>
             <div className="flex flex-row justify-between px-4">
                 <p>保存先：</p>
                 <p>積み本</p>

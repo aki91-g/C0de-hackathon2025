@@ -10,7 +10,7 @@ class BookStatus(str, Enum):
     STORE = 'store'
     RESERVE = 'reserve'
     READ = 'read'
-    DETETE = 'deleted'
+    DETETE = 'delete'
 
 class BookBase(BaseModel):
     title: str

@@ -19,7 +19,6 @@ class BookBase(BaseModel):
     description: Optional[str] = None
     status: BookStatus = BookStatus.STORE 
     last_modified: datetime = Field(default_factory=datetime.now(timezone.utc))
-    created_at: datetime = Field(default_factory=datetime.now(timezone.utc))
     status_reserve_at: datetime | None = Field(default=None)
     status_store_at : datetime | None = Field(default=None)
     status_read_at: datetime | None = Field(default=None)

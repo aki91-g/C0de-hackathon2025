@@ -2,6 +2,7 @@
 
 from fastapi import APIRouter, Depends, HTTPException
 from typing import List, Dict, Any
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 from back.app.schemas.books import BookStatus
 from back.database import connection
@@ -27,6 +28,13 @@ def count_read(session: Session = Depends(connection.get_db)):
 def count_read(session: Session = Depends(connection.get_db)):
     store = session.query(Books).filter(Books.status == BookStatus.STORE.value).count()
     return store
+
+# 積読総額
+@router.get("/sum/store", response_model=int)
+def sum_store_cost(session: Session = Depends(connection.get_db)):
+    query = session.query(func.sum(Books.cost)).filter(Books.status == BookStatus.STORE.value)
+    total_cost = query.scalar() 
+    return total_cost if total_cost is not None else 0
 
 # ある日の読了数
 @router.get("/graph/ondate_read/{days}", response_model=List[Dict[str, Any]])

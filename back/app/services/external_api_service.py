@@ -5,6 +5,7 @@ import os
 import xml.etree.ElementTree as ET
 import asyncio
 import logging
+import re
 from typing import Optional
 from dotenv import load_dotenv
 from app.schemas.books import BookExternalInfo
@@ -132,6 +133,60 @@ async def fetch_book_from_ndl(isbn: str) -> Optional[BookExternalInfo]:
         logger.error(f"NDL Search: Unexpected error for ISBN {isbn}: {e}")
         return None
 
+
+async def fetch_book_from_openbd(isbn: str) -> Optional[BookExternalInfo]:
+    try:
+        async with httpx.AsyncClient() as client:
+            url = f"https://api.openbd.jp/v1/get?isbn={isbn}"
+            #url = f"https://api.openbd.jp/v1/get?isbn=978-4088807232"
+            response = await client.get(url)
+            print(f"DEBUG: OpenBD Status Code: {response.status_code}")
+            response.raise_for_status()  # Raise HTTPError for bad responses (4xx or 5xx)
+            data = response.json()
+
+            if data[0]["onix"] != None:
+                summary = data[0]["summary"]
+                title = summary.get("title","")
+                authors = summary.get("author","")
+                publisher = summary.get("publisher","")
+                published_date = summary.get("pubdate","")
+                if len(published_date) == 6:
+                    published_year = published_date[:4]
+                    published_day = published_date[4:]
+                    published_date = published_year + "-" + published_day
+                elif len(published_date) == 8:
+                    published_year = published_date[:4]
+                    published_month = published_date[4:6]
+                    published_day = published_date[6:]
+                    published_date = published_year + "-" + published_month + "-" + published_day
+                collateral_detail = data[0]["onix"]["CollateralDetail"]
+                supporting_resource = collateral_detail.get("SupportingResource") if collateral_detail else None
+                cover_image_url = supporting_resource[0]["ResourceVersion"][0].get("ResourceLink","") if supporting_resource else None
+                product_supply = data[0]["onix"]["ProductSupply"]
+                supply_detail = product_supply.get("SupplyDetail")
+                price = supply_detail.get("Price")
+                price_amount = price[0].get("PriceAmount") if price else None
+                cost = re.findall(r"\d+", price_amount)
+
+                print("openBD completed")
+                return BookExternalInfo(
+                    isbn=isbn,
+                    title=title,
+                    author=authors,
+                    publisher=publisher,
+                    publication_date=published_date,
+                    cover_image_url=cover_image_url,
+                    cost = cost[0],
+                )
+            else:
+                return None
+    except httpx.HTTPStatusError as e:
+        logger.error(f"OpenBD: HTTP error occurred for ISBN {isbn}: Status={e.response.status_code}. Detail={e}")
+        logger.debug(f"OpenBD Response Text: {e.response.text}")
+        return None
+    except Exception as e:
+        logger.error(f"OpenBD: Unexpected error occurred for ISBN {isbn}: {e}")
+        return None
 
 async def get_book_info(isbn: str) -> Optional[BookExternalInfo]:
     book = await fetch_book_from_google_books(isbn)

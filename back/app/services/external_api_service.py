@@ -5,10 +5,9 @@ import os
 import xml.etree.ElementTree as ET
 import asyncio
 import logging
-import re
 from typing import Optional
 from dotenv import load_dotenv
-from back.app.schemas.books import BookExternalInfo
+from app.schemas.books import BookExternalInfo
 
 logger = logging.getLogger(__name__)
 
@@ -36,8 +35,6 @@ async def fetch_book_from_google_books(isbn: str) -> Optional[BookExternalInfo]:
                 image_links = book_data.get("imageLinks")
                 cover_image_url = image_links.get("thumbnail") if image_links else None
 
-
-                print("Google completed")
                 return BookExternalInfo(
                     isbn=isbn,
                     title=title,
@@ -45,7 +42,6 @@ async def fetch_book_from_google_books(isbn: str) -> Optional[BookExternalInfo]:
                     publisher=publisher,
                     publication_date=published_date,
                     cover_image_url=cover_image_url,
-                    cost = 0,
                 )
             else:
                 return None
@@ -87,8 +83,7 @@ def _map_ndl_data(isbn: str, xml_content) -> Optional[BookExternalInfo]:
             author=author_str,
             publisher=publisher_element.text if publisher_element is not None else 'unknown publisher',
             publication_date=published_date,
-            source="NDL Search",
-            cost = 0
+            source="NDL Search"
         )
     
     except ET.ParseError as e:
@@ -138,86 +133,11 @@ async def fetch_book_from_ndl(isbn: str) -> Optional[BookExternalInfo]:
         return None
 
 
-async def fetch_book_from_openbd(isbn: str) -> Optional[BookExternalInfo]:
-    try:
-        async with httpx.AsyncClient() as client:
-            url = f"https://api.openbd.jp/v1/get?isbn={isbn}"
-            #url = f"https://api.openbd.jp/v1/get?isbn=978-4088807232"
-            response = await client.get(url)
-            print(f"DEBUG: OpenBD Status Code: {response.status_code}")
-            response.raise_for_status()  # Raise HTTPError for bad responses (4xx or 5xx)
-            data = response.json()
-
-            if data[0]["onix"] != None:
-                summary = data[0]["summary"]
-                title = summary.get("title","")
-                authors = summary.get("author","")
-                publisher = summary.get("publisher","")
-                published_date = summary.get("pubdate","")
-                if len(published_date) == 6:
-                    published_year = published_date[:4]
-                    published_day = published_date[4:]
-                    published_date = published_year + "-" + published_day
-                elif len(published_date) == 8:
-                    published_year = published_date[:4]
-                    published_month = published_date[4:6]
-                    published_day = published_date[6:]
-                    published_date = published_year + "-" + published_month + "-" + published_day
-                collateral_detail = data[0]["onix"]["CollateralDetail"]
-                supporting_resource = collateral_detail.get("SupportingResource") if collateral_detail else None
-                cover_image_url = supporting_resource[0]["ResourceVersion"][0].get("ResourceLink","") if supporting_resource else None
-                product_supply = data[0]["onix"]["ProductSupply"]
-                supply_detail = product_supply.get("SupplyDetail")
-                price = supply_detail.get("Price")
-                price_amount = price[0].get("PriceAmount") if price else None
-                cost = re.findall(r"\d+", price_amount)
-
-                print("openBD completed")
-                return BookExternalInfo(
-                    isbn=isbn,
-                    title=title,
-                    author=authors,
-                    publisher=publisher,
-                    publication_date=published_date,
-                    cover_image_url=cover_image_url,
-                    cost = cost[0],
-                )
-            else:
-                return None
-    except httpx.HTTPStatusError as e:
-        logger.error(f"OpenBD: HTTP error occurred for ISBN {isbn}: Status={e.response.status_code}. Detail={e}")
-        logger.debug(f"OpenBD Response Text: {e.response.text}")
-        return None
-    except Exception as e:
-        logger.error(f"OpenBD: Unexpected error occurred for ISBN {isbn}: {e}")
-        return None
-
-
 async def get_book_info(isbn: str) -> Optional[BookExternalInfo]:
-    fetch = [fetch_book_from_google_books,fetch_book_from_openbd,fetch_book_from_ndl]
-    book = None
-    count = 0
-    while book == None and count < len(fetch):
-        book = await fetch[count](isbn)
-        count += 1
-    while count < len(fetch):
-        checker = book.check()
-        if checker == None:
-            count = len(fetch)
-        else:
-            book_a = await fetch[count](isbn)
-            if book_a != None:
-                if checker[0] == 1:
-                    book.set_title(book_a.get_title())
-                if checker[1] == 1:
-                    book.set_author(book_a.get_author())
-                if checker[2] == 1:
-                    book.set_publisher(book_a.get_publisher())
-                if checker[3] == 1:
-                    book.set_publication_date(book_a.get_publication_date())
-                if checker[4] == 1:
-                    book.set_cover_image_url(book_a.get_cover_image_url())
-                if checker[5] == 1:
-                    book.set_cost(book_a.get_cost())
-            count += 1
-    return book
+    book = await fetch_book_from_google_books(isbn)
+    if book:
+        return book
+    book = await fetch_book_from_ndl(isbn)
+    if book:
+        return book
+    return None

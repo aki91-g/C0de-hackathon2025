@@ -19,8 +19,7 @@ export default function AutoFitText({ text }: { text: string }) {
       el.style.fontSize = size + "px";
 
       const overflow =
-        el.scrollHeight > el.clientHeight ||
-        el.scrollWidth > el.clientWidth;
+        el.scrollHeight > el.clientHeight || el.scrollWidth > el.clientWidth;
 
       if (!overflow) break;
 

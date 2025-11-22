@@ -2,7 +2,7 @@
 
 from fastapi import APIRouter, HTTPException
 from typing import Optional
-from back.app.services import external_api_service
+from app.services import external_api_service
 
 
 router = APIRouter()

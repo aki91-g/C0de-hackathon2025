@@ -12,7 +12,7 @@ class Books(Base):
     id = Column(Integer, primary_key=True, index=True)
     title = Column(String, index=True)
     author = Column(String)
-    isbn = Column(String, unique=True, index=True)
+    isbn = Column(String, unique=True, index=True, nullable=True)
     cover_image_url = Column(String)
     cost = Column(Integer, default = 0)
     description = Column(String, nullable=True)

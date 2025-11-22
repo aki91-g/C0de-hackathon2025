@@ -42,6 +42,9 @@ def main() -> None:
     port = int(os.environ.get("BACKEND_PORT", "8000"))
     uvicorn.run(app, host="0.0.0.0", port=port)
 
+@app.get("/")
+def root() -> dict[str, str]:
+    return {"status": "ok"}
 
 if __name__ == "__main__":
     main()

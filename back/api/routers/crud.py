@@ -4,11 +4,11 @@ from datetime import datetime, timezone
 from fastapi import APIRouter, HTTPException, Depends, status
 from typing import Optional, List
 from sqlalchemy.orm import Session
-from back.app.schemas import books
-from back.database import connection
-from back.database.models import book_model
-from back.app.services.crud_service import update_book_status, create_book_from_external_reserve, create_book_from_external_store
-from back.app.services import external_api_service, initialize_service
+from app.schemas import books
+from database import connection
+from database.models import book_model
+from app.services.crud_service import update_book_status, create_book_from_external_reserve, create_book_from_external_store
+from app.services import external_api_service, initialize_service
 
 router = APIRouter()
 
@@ -44,20 +44,19 @@ def read_books(skip: int = 0, limit: int = 100, session: Session = Depends(conne
 # 登録本更新順
 @router.get("/reserve", response_model=List[books.Book])
 def read_books_reserve(skip: int = 0, limit: int = 100, session: Session = Depends(connection.get_db)):
-    status_reserve_books = session.query(book_model.Books).filter(book_model.Books.status == books.BookStatus.RESERVE.value).order_by(book_model.Books.last_modified).offset(skip).limit(limit).all()
+    status_reserve_books = session.query(book_model.Books).filter(book_model.Books.status == books.BookStatus.RESERVE.value).order_by(book_model.Books.status_reserve_at).offset(skip).limit(limit).all()
     return status_reserve_books
-
 
 # 読了本更新順
 @router.get("/read", response_model=List[books.Book])
 def read_books_read(skip: int = 0, limit: int = 100, session: Session = Depends(connection.get_db)):
-    status_read_books = session.query(book_model.Books).filter(book_model.Books.status == books.BookStatus.READ.value).order_by(book_model.Books.last_modified).offset(skip).limit(limit).all()
+    status_read_books = session.query(book_model.Books).filter(book_model.Books.status == books.BookStatus.READ.value).order_by(book_model.Books.status_read_at).offset(skip).limit(limit).all()
     return status_read_books
 
 # 積読本更新順
 @router.get("/store", response_model=List[books.Book])
 def read_books_store(skip: int = 0, limit: int = 100, session: Session = Depends(connection.get_db)):
-    status_store_books = session.query(book_model.Books).filter(book_model.Books.status == books.BookStatus.STORE.value).order_by(book_model.Books.last_modified).offset(skip).limit(limit).all()
+    status_store_books = session.query(book_model.Books).filter(book_model.Books.status == books.BookStatus.STORE.value).order_by(book_model.Books.status_store_at).offset(skip).limit(limit).all()
     return status_store_books
 
 

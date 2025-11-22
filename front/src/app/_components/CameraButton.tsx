@@ -31,13 +31,23 @@ export default function FabMenu() {
       )}
 
       {/* メインFAB */}
-      {open ? 
-      <button onClick={() => setOpen(!open)} 
-        className="w-14 h-14 flex items-center justify-center rounded-full bg-white text-black shadow-xl hover:bg-gray-100 transition"
-      > <X size={32} /> </button> : 
-      <button onClick={() => setOpen(!open)}
-        className="w-14 h-14 flex items-center justify-center rounded-full bg-blue-600 text-white shadow-xl hover:bg-blue-700 transition"
-      > <Plus size={32} /> </button>}
+      {open ? (
+        <button
+          onClick={() => setOpen(!open)}
+          className="w-14 h-14 flex items-center justify-center rounded-full bg-white text-black shadow-xl hover:bg-gray-100 transition"
+        >
+          {" "}
+          <X size={32} />{" "}
+        </button>
+      ) : (
+        <button
+          onClick={() => setOpen(!open)}
+          className="w-14 h-14 flex items-center justify-center rounded-full bg-blue-600 text-white shadow-xl hover:bg-blue-700 transition"
+        >
+          {" "}
+          <Plus size={32} />{" "}
+        </button>
+      )}
     </div>
   );
 }

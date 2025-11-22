@@ -6,9 +6,9 @@ from sqlalchemy.orm import Session
 
 from fastapi import HTTPException, status
 
-from back.database.models.book_model import Books 
-from back.app.schemas.books import BookStatus, BookExternalInfo
-from back.app.services import external_api_service
+from database.models.book_model import Books 
+from app.schemas.books import BookStatus, BookExternalInfo
+from app.services import external_api_service
 
 
 def update_book_status(session: Session, book_id: int, new_status: str) -> Optional[Books]:
@@ -25,6 +25,8 @@ def update_book_status(session: Session, book_id: int, new_status: str) -> Optio
             db_book.status_store_at = now_utc
         if new_status==BookStatus.READ:
             db_book.status_read_at = now_utc
+        if new_status==BookStatus.DETETE:
+            db_book.isbn = None
         db_book.last_modified = now_utc
         
         session.commit()

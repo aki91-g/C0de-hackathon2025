@@ -133,78 +133,12 @@ async def fetch_book_from_ndl(isbn: str) -> Optional[BookExternalInfo]:
         logger.error(f"NDL Search: Unexpected error for ISBN {isbn}: {e}")
         return None
 
-async def fetch_book_from_openbd(isbn: str) -> Optional[BookExternalInfo]:
-    """OpenBD APIから書籍情報を取得する。"""
-    try:
-        async with httpx.AsyncClient() as client:
-            url = f"https://api.openbd.jp/v1/get?isbn={isbn}"
-            response = await client.get(url)
-            logger.debug(f"OpenBD Status Code: {response.status_code}")
-            response.raise_for_status()
-            data = response.json()
-
-            if data and data[0] and data[0].get("onix") != None:
-                summary = data[0]["summary"]
-                onix = data[0]["onix"]
-                
-                title = summary.get("title")
-                authors = summary.get("author")
-                publisher = summary.get("publisher")
-                published_date_raw = summary.get("pubdate", "")
-                
-                published_date = published_date_raw
-                if len(published_date_raw) == 6:
-                    published_date = f"{published_date_raw[:4]}-{published_date_raw[4:]}"
-                elif len(published_date_raw) == 8:
-                    published_date = f"{published_date_raw[:4]}-{published_date_raw[4:6]}-{published_date_raw[6:]}"
-
-                cover_image_url = None
-                collateral_detail = onix.get("CollateralDetail")
-                if collateral_detail:
-                    supporting_resource = collateral_detail.get("SupportingResource")
-                    if supporting_resource and supporting_resource[0]["ResourceVersion"]:
-                        cover_image_url = supporting_resource[0]["ResourceVersion"][0].get("ResourceLink")
-
-                cost_int: Optional[int] = None
-                product_supply = onix.get("ProductSupply")
-                if product_supply:
-                    supply_detail = product_supply.get("SupplyDetail")
-                    if supply_detail and supply_detail.get("Price"):
-                        price = supply_detail["Price"][0]
-                        price_amount_raw = price.get("PriceAmount")
-                        if price_amount_raw:
-                            price_match = re.findall(r"\d+", str(price_amount_raw))
-                            if price_match:
-                                try:
-                                    cost_int = int(price_match[0])
-                                except ValueError:
-                                    logger.warning(f"OpenBD: Could not convert cost '{price_match[0]}' to int for ISBN {isbn}")
-                                    cost_int = None
-                
-                logger.info("OpenBD completed successfully.")
-                return BookExternalInfo(
-                    isbn=isbn,
-                    title=title,
-                    author=authors,
-                    publisher=publisher,
-                    publication_date=published_date,
-                    cost=cost_int,
-                )
-            else:
-                return None
-    except httpx.HTTPStatusError as e:
-        logger.error(f"OpenBD: HTTP error for ISBN {isbn}: Status={e.response.status_code}.")
-        return None
-    except Exception as e:
-        logger.error(f"OpenBD: Unexpected error for ISBN {isbn}: {e}")
-        return None
 
 BOOK_FIELDS = BookExternalInfo.model_fields.keys()
 async def get_book_info(isbn: str) -> Optional[BookExternalInfo]:
 
     fetchers: List[Callable[[str], Awaitable[Optional[BookExternalInfo]]]] = [
         fetch_book_from_google_books,
-        fetch_book_from_openbd,
         fetch_book_from_ndl
     ]
 

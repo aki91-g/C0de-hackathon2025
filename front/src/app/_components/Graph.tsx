@@ -12,9 +12,9 @@ import {
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 
 // ---- グラフコンポーネント ----
-function ChartBase({ data, color }: { data: { date: string; value: number }[], color: string }) {
-  const maxValue = Math.max(...data.map((d) => d.value));
-  const yMax = Math.ceil(maxValue / 10) * 10;
+function ChartBase({ data, color }: { data: { date: string; value: number }[]; color: string }) {
+  const maxValue = data.length > 0 ? Math.max(...data.map((d) => d.value)) : 0;
+  const yMax = maxValue > 0 ? Math.ceil(maxValue / 10) * 10 : 10;
 
   return (
     <div className="w-full h-72 p-4">

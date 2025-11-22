@@ -10,7 +10,7 @@ export default function NumberInput({ book }: {book: Book}) {
   const [value, setValue] = useState(book.cost.toString());
   const router = useRouter();
 
-    async function patchCost(cost: Number): Promise<Book> {
+    async function patchCost(cost: number): Promise<Book> {
     try {
       const response = await fetch(`${BACKEND_BASE_URL}/books/${book.id}/cost`, {
         method: "PATCH",

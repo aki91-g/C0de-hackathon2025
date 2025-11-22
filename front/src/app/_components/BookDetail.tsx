@@ -35,11 +35,6 @@ export default function BookDetailDialog({ book, onClose }: { book: Book, onClos
     return formatter.format(date);
   }
 
-const formatter = new Intl.DateTimeFormat("ja-JP", {
-  month: "long",  // "2月"
-  day: "numeric", // "14日"
-});
-
   return (
     <Dialog open={true} onOpenChange={onClose}>
       <DialogContent>

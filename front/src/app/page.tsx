@@ -24,7 +24,7 @@ async function getBooks(): Promise<Book[]> {
 
 type GraphValue = {
   date: string;
-  value: Number;
+  value: number;
 }
 
 async function getStores(): Promise<GraphValue[]> {
@@ -75,7 +75,7 @@ async function getNewReads(): Promise<GraphValue[]> {
   }
 }
 
-async function getCosts(): Promise<Number> {
+async function getCosts(): Promise<number> {
   try {
     const response = await fetch(`${BACKEND_BASE_URL}/status/sum/store`, {
       method: "GET",
@@ -85,7 +85,7 @@ async function getCosts(): Promise<Number> {
       throw new Error(`Backend responded with ${response.status}`);
     }
 
-    return (await response.json()) as Number
+    return (await response.json()) as number
   } catch {
     return -1;
   }

@@ -2,11 +2,9 @@
 
 import { useState } from "react";
 import { Menu, X } from "lucide-react";
-import { useRouter } from "next/navigation";
 
 export default function Header() {
   const [open, setOpen] = useState(false);
-  const router = useRouter();
 
   return (
     <header className="fixed top-0 left-0 w-full z-50 border-b bg-black">

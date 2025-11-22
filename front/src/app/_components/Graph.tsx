@@ -31,14 +31,21 @@ function ChartBase({ data, color }: { data: { date: string; value: number }[], c
   );
 }
 
+type GraphProps = {
+  values1: { date: string; value: number }[];
+  values2: { date: string; value: number }[];
+  values3: { date: string; value: number }[];
+  cost: number;
+};
+
 // ---- メインコンポーネント ----
-export default function WeekGraph({ values1, values2, values3, cost }) {
+export default function WeekGraph({ values1, values2, values3, cost }: GraphProps) {
   return (
     <div className="w-full max-w-2xl mx-auto mt-8">
       <div className="h-64 flex justify-between py-4">
         <div className="w-1/2">
           <h1 className="text-4xl font-bold mb-6 text-center">現在の積読量</h1>
-          <h1 className="text-8xl font-bold mb-6 text-center text-red-600">{values1[values1.length-1].value}冊</h1>
+          <h1 className="text-8xl font-bold mb-6 text-center text-red-600">{values1.length > 0 ? values1[values1.length-1].value : 0}冊</h1>
         </div>      
         <div className="w-1/2 py-4">
           <h1 className="text-4xl font-bold mb-6 text-center">現在の積読総額</h1>

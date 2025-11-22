@@ -5,8 +5,8 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, sessionmaker
 from typing import  Generator, Any
 
-from back.database.models.book_model import Books 
-from back.app.services.external_api_service import BookExternalInfo
+from database.models.book_model import Books 
+from app.services.external_api_service import BookExternalInfo
 
 
 DATABASE_URL = os.getenv("DATABASE_URL")

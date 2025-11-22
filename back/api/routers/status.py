@@ -4,10 +4,10 @@ from fastapi import APIRouter, Depends, HTTPException
 from typing import List, Dict, Any
 from sqlalchemy import func
 from sqlalchemy.orm import Session
-from back.app.schemas.books import BookStatus
-from back.database import connection
-from back.database.models.book_model import Books
-from back.app.services.status_service import get_daily_read_counts, get_daily_store_counts, get_daily_store_acumulative_counts
+from app.schemas.books import BookStatus
+from database import connection
+from database.models.book_model import Books
+from app.services.status_service import get_daily_read_counts, get_daily_store_counts, get_daily_store_acumulative_counts
 
 router = APIRouter()
 

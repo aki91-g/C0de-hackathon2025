@@ -4,8 +4,8 @@ from sqlalchemy.orm import Session
 from sqlalchemy import func, Date
 from typing import List, Dict, Any
 from datetime import datetime, timedelta, timezone
-from back.app.schemas.books import BookStatus
-from back.database.models.book_model import Books
+from app.schemas.books import BookStatus
+from database.models.book_model import Books
 
 def get_daily_read_counts(db: Session, days: int) -> List[Dict[str, Any]]:
     """

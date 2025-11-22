@@ -7,7 +7,7 @@ import asyncio
 import logging
 from typing import Optional
 from dotenv import load_dotenv
-from back.app.schemas.books import BookExternalInfo
+from app.schemas.books import BookExternalInfo
 
 logger = logging.getLogger(__name__)
 

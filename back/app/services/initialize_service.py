@@ -3,9 +3,9 @@
 import random
 from datetime import datetime, timedelta, timezone
 from sqlalchemy.orm import Session
-from back.database.models.book_model import Books 
-from back.app.services.external_api_service import BookExternalInfo # Note: You may need to adjust this import path if different
-from back.app.schemas.books import BookStatus # Assuming BookStatus is defined here or imported
+from database.models.book_model import Books 
+from app.services.external_api_service import BookExternalInfo # Note: You may need to adjust this import path if different
+from app.schemas.books import BookStatus # Assuming BookStatus is defined here or imported
 
 def get_random_past_datetime(days_back: int) -> datetime:
     """Returns a random datetime between 'days_back' ago and now (UTC)."""

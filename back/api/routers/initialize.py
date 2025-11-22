@@ -1,10 +1,10 @@
 # api/routers/initialize.py データベースの初期化
 
-from back.database.models import book_model
+from database.models import book_model
 from fastapi import APIRouter, HTTPException, Depends, Query
 from sqlalchemy.orm import Session
-from back.database import connection
-from back.app.services import external_api_service, initialize_service
+from database import connection
+from app.services import external_api_service, initialize_service
 
 router = APIRouter()
 

@@ -11,38 +11,6 @@ import {
 } from "recharts";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 
-// ---- モックデータ生成 ----
-// 直近1週間の日付配列
-function getLast7Days() {
-  const days = [];
-  for (let i = 6; i >= 0; i--) {
-    const d = new Date();
-    d.setDate(d.getDate() - i);
-    days.push(`${d.getMonth() + 1}/${d.getDate()}`);
-  }
-  return days;
-}
-
-const labels: string[] = getLast7Days();
-
-// 積読総量（例：累積していくイメージ）
-const tsundokuTotal = labels.map((label, i) => ({
-  date: label,
-  value: 30 + i * 2, // モック値
-}));
-
-// 新規購入冊数（毎日変動するイメージ）
-const purchasedBooks = labels.map((label) => ({
-  date: label,
-  value: Math.floor(Math.random() * 4),
-}));
-
-// 読了冊数（毎日変動）
-const readBooks = labels.map((label) => ({
-  date: label,
-  value: Math.floor(Math.random() * 3),
-}));
-
 // ---- グラフコンポーネント ----
 function ChartBase({ data, color }: { data: { date: string; value: number }[], color: string }) {
   const maxValue = Math.max(...data.map((d) => d.value));
@@ -64,11 +32,19 @@ function ChartBase({ data, color }: { data: { date: string; value: number }[], c
 }
 
 // ---- メインコンポーネント ----
-export default function WeekGraph() {
+export default function WeekGraph({ values1, values2, values3, cost }) {
   return (
     <div className="w-full max-w-2xl mx-auto mt-8">
-      <h1 className="text-4xl font-bold mb-6 text-center">現在の積読量</h1>
-      <h1 className="text-9xl font-bold mb-6 text-center text-red-600">{tsundokuTotal[tsundokuTotal.length-1].value}冊</h1>
+      <div className="h-64 flex justify-between py-4">
+        <div className="w-1/2">
+          <h1 className="text-4xl font-bold mb-6 text-center">現在の積読量</h1>
+          <h1 className="text-8xl font-bold mb-6 text-center text-red-600">{values1[values1.length-1].value}冊</h1>
+        </div>      
+        <div className="w-1/2 py-4">
+          <h1 className="text-4xl font-bold mb-6 text-center">現在の積読総額</h1>
+          <h1 className="text-6xl font-bold mb-6 text-center text-red-600">{cost}円</h1>
+        </div>      
+      </div>
       <h1 className="text-2xl font-bold mb-6 text-left">積読グラフ</h1>
 
       <Tabs defaultValue="total" className="w-full">
@@ -79,15 +55,15 @@ export default function WeekGraph() {
         </TabsList>
 
         <TabsContent value="total">
-          <ChartBase data={tsundokuTotal} color="red" />
+          <ChartBase data={values1} color="red" />
         </TabsContent>
 
         <TabsContent value="purchased">
-          <ChartBase data={purchasedBooks} color="orange" />
+          <ChartBase data={values2} color="orange" />
         </TabsContent>
 
         <TabsContent value="read">
-          <ChartBase data={readBooks} color="blue" />
+          <ChartBase data={values3} color="blue" />
         </TabsContent>
       </Tabs>
     </div>

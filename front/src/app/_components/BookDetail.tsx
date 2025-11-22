@@ -2,16 +2,15 @@
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useState } from "react";
-import { Textarea } from "@/components/ui/textarea";
 import Image from "next/image";
 import type { Book } from "@/types/book";
 import DialogToStore from "./DialogToStore";
 import DialogToRead from "./DialogToread";
 import DialogToDelete from "./DialogToDelete";
 import { useRouter } from "next/navigation";
+import NumberInput from "./NumberInput";
 
 export default function BookDetailDialog({ book, onClose }: { book: Book, onClose: any }) {
-  const [memo, setMemo] = useState("");
   const [hasError, setHasError] = useState(false);
   const [dialog, setDialog] = useState("");
   const router = useRouter();
@@ -27,6 +26,20 @@ export default function BookDetailDialog({ book, onClose }: { book: Book, onClos
     }
   }
 
+  function dateFormat(str: string){
+    const date = new Date(str);
+    const formatter = new Intl.DateTimeFormat("ja-JP", {
+      month: "long",  // "2月"
+      day: "numeric", // "14日"
+    });
+    return formatter.format(date);
+  }
+
+const formatter = new Intl.DateTimeFormat("ja-JP", {
+  month: "long",  // "2月"
+  day: "numeric", // "14日"
+});
+
   return (
     <Dialog open={true} onOpenChange={onClose}>
       <DialogContent>
@@ -34,7 +47,7 @@ export default function BookDetailDialog({ book, onClose }: { book: Book, onClos
           <DialogTitle>{book.title}</DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-4">
+        <div className="py-2">
           {/* 画像 */}
           {book.cover_image_url && !hasError ? 
             <div className="w-full h-40 flex items-center justify-center">
@@ -47,20 +60,29 @@ export default function BookDetailDialog({ book, onClose }: { book: Book, onClos
             </div>
           }
 
-          {/* あらすじ */}
-          <div>
-            <h2 className="font-bold">あらすじ</h2>
-            <p className="text-sm">{book.description}</p>
-          </div>
-
-          {/* メモ入力欄 */}
-          <div>
-            <h2 className="font-bold mb-1">メモ</h2>
-            <Textarea
-              placeholder="ここにメモを入力"
-              value={memo}
-              onChange={(e) => setMemo(e.target.value)}
-            />
+          <div className="h-24 flex justify-between py-4">
+            {book.status === "store" &&   
+              <div className="w-1/2 px-8">
+                <h2 className="font-bold mb-1">積んだ日</h2>
+                {dateFormat(book.status_store_at)}
+              </div>
+            }
+            {book.status === "reserve" &&   
+              <div className="w-1/2 px-8">
+                <h2 className="font-bold mb-1">登録日</h2>
+                {dateFormat(book.status_reserve_at)}
+              </div>
+            }
+            {book.status === "read" &&   
+              <div className="w-1/2 px-8">
+                <h2 className="font-bold mb-1">読了日</h2>
+                {dateFormat(book.status_read_at)}
+              </div>
+            }
+            <div>
+              <h2 className="font-bold mb-1">購入金額</h2>
+              <NumberInput book={book} />円
+            </div>
           </div>
 
           {/* ボタン */}

@@ -22,8 +22,81 @@ async function getBooks(): Promise<Book[]> {
   }
 }
 
+type GraphValue = {
+  date: string;
+  value: Number;
+}
+
+async function getStores(): Promise<GraphValue[]> {
+  try {
+    const response = await fetch(`${BACKEND_BASE_URL}/status/graph/accumulative_store/7`, {
+      method: "GET",
+    });
+
+    if (!response.ok) {
+      throw new Error(`Backend responded with ${response.status}`);
+    }
+
+    return (await response.json()) as GraphValue[]
+  } catch {
+    return [];
+  }
+}
+
+async function getNewStores(): Promise<GraphValue[]> {
+  try {
+    const response = await fetch(`${BACKEND_BASE_URL}/status/graph/ondate_store/7`, {
+      method: "GET",
+    });
+
+    if (!response.ok) {
+      throw new Error(`Backend responded with ${response.status}`);
+    }
+
+    return (await response.json()) as GraphValue[]
+  } catch {
+    return [];
+  }
+}
+
+async function getNewReads(): Promise<GraphValue[]> {
+  try {
+    const response = await fetch(`${BACKEND_BASE_URL}/status/graph/ondate_read/7`, {
+      method: "GET",
+    });
+
+    if (!response.ok) {
+      throw new Error(`Backend responded with ${response.status}`);
+    }
+
+    return (await response.json()) as GraphValue[]
+  } catch {
+    return [];
+  }
+}
+
+async function getCosts(): Promise<Number> {
+  try {
+    const response = await fetch(`${BACKEND_BASE_URL}/status/sum/store`, {
+      method: "GET",
+    });
+
+    if (!response.ok) {
+      throw new Error(`Backend responded with ${response.status}`);
+    }
+
+    return (await response.json()) as Number
+  } catch {
+    return -1;
+  }
+}
+
 export default async function Home() {
   const books = await getBooks();
+  const stores = await getStores();
+  const newStores = await getNewStores();
+  const newReads = await getNewReads();
+  const cost = await getCosts();
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
@@ -31,7 +104,7 @@ export default async function Home() {
         <FabMenu />
         
         <section className="space-y-6">
-          <Graph />
+          <Graph values1={stores} values2={newStores} values3={newReads} cost={cost} />
           <BookMenu prop="store" books={books} />
           <BookMenu prop="reserve" books={books}/>
           <BookMenu prop="read" books={books}/>

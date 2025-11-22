@@ -2,16 +2,18 @@
 
 import { useState } from "react";
 import { Menu, X } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 export default function Header() {
   const [open, setOpen] = useState(false);
+  const router = useRouter();
 
   return (
     <header className="fixed top-0 left-0 w-full z-50 border-b bg-black">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
         {/* 左端：サイト名 */}
         <div className="text-xl font-bold text-white">
-          積読解消アプリ
+          <a href="/">済読アプリ とにかくよめ!!</a>
         </div>
 
         {/* 右端：ログインボタン & ハンバーガー */}
@@ -34,13 +36,13 @@ export default function Header() {
       {/* モバイルメニュー */}
       {open && (
         <div className="border-t bg-gray-50 px-4 py-3">
-          <a href="" className="block py-2">
+          <a href="/" className="block py-2">
             項目1
           </a>
-          <a href="" className="block py-2">
+          <a href="/" className="block py-2">
             項目2
           </a>
-          <a href="" className="block py-2">
+          <a href="/" className="block py-2">
             項目3
           </a>
         </div>

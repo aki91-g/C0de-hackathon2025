@@ -22,10 +22,13 @@ async function deleteBook(book: Book): Promise<Book> {
       author: "",
       isbn: "",
       cover_image_url: "",
+      cost: 0,
       description: "Error",
       status: "",
       last_modified: "",
-      status_changed_at: "",
+      status_reserve_at: "",
+      status_store_at: "",
+      status_read_at: "",
       id: -1,
     };
   }

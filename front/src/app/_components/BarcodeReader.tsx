@@ -9,9 +9,32 @@ enum RegisterStatus {
     FAILURE
 }
 
-const registerBook = async (isbn: string): Promise<RegisterStatus> => {
+const registerReserveBook = async (isbn: string): Promise<RegisterStatus> => {
     try {
-        const response = await fetch("/api/books/external/", {
+        const response = await fetch("/api/books/external/reserve/", {
+            method: "POST",
+            headers: { "Content-Type": "application/json", },
+            body: JSON.stringify({ isbn }),
+        });
+
+        if (!response.ok) {
+            if (response.status === 409) {
+                return RegisterStatus.ALREADY_REGISTERED;
+            }
+            throw new Error("Failed to register book");
+        }
+        console.log("Book registered successfully");
+    } catch (error) {
+        console.error("Error registering book:", error);
+        return RegisterStatus.FAILURE;
+    }
+
+    return RegisterStatus.SUCCESS;
+};
+
+const registerStoreBook = async (isbn: string): Promise<RegisterStatus> => {
+    try {
+        const response = await fetch("/api/books/external/store/", {
             method: "POST",
             headers: { "Content-Type": "application/json", },
             body: JSON.stringify({ isbn }),
@@ -57,7 +80,11 @@ function Modal({open, onClose, title, message, confirmText="確認"}: ModalProps
     </div>)
 }
 
-export default function BarcodeReader() {
+type BarcodeReaderProps = {
+    bookRegisterMode: "store" | "reserve";
+}
+
+export default function BarcodeReader({bookRegisterMode}: BarcodeReaderProps) {
     const videoRef = useRef<HTMLVideoElement>(null);
     const [isbnText, setISBNText] = useState("");
     const [modalTitle, setModalTitle] = useState("");
@@ -69,7 +96,12 @@ export default function BarcodeReader() {
     const handleClose = async () => {
         if (modalType === "confirm") {
             console.log("Registering book with ISBN:", isbnText);
-            const result = await registerBook(isbnText);
+            let result: RegisterStatus;
+            if (bookRegisterMode === "reserve") {
+                result = await registerReserveBook(isbnText);
+            } else {
+                result = await registerStoreBook(isbnText);
+            }
 
             setModalType("result");
             if (result === RegisterStatus.SUCCESS) {
@@ -144,12 +176,24 @@ export default function BarcodeReader() {
             message={modalMessage}
             confirmText={modalConfirmText}
         ></Modal>
-        <video ref={videoRef} style={{width: "100%"}}/>
+        <video ref={videoRef} className="w-full"/>
+        {/* ここから Test 用コードです*/}
         <button onClick={() => {
+            setISBNText("9784087700039");
+        }} className="mt-4 px-4 py-2 bg-blue-500 text-white rounded">
+            バーコード読み取りテスト（森羅記）
+        </button>
+                <button onClick={() => {
+            setISBNText("9784061595842");
+        }} className="mt-4 px-4 py-2 bg-blue-500 text-white rounded">
+            バーコード読み取りテスト（明治維新）
+        </button>
+                <button onClick={() => {
             setISBNText("9784102134054");
         }} className="mt-4 px-4 py-2 bg-blue-500 text-white rounded">
-            バーコード読み取りテスト
+            バーコード読み取りテスト（シャーロックホームズ 緋色の研究）
         </button>
+        {/* ここまで Test 用コードです*/}
     </>
     );
 }

@@ -5,7 +5,8 @@ import os
 import xml.etree.ElementTree as ET
 import asyncio
 import logging
-from typing import Optional
+from typing import Optional, List, Callable, Awaitable, Dict, Any
+from back.app.schemas.books import BookExternalInfo
 from dotenv import load_dotenv
 from back.app.schemas.books import BookExternalInfo
 
@@ -132,12 +133,100 @@ async def fetch_book_from_ndl(isbn: str) -> Optional[BookExternalInfo]:
         logger.error(f"NDL Search: Unexpected error for ISBN {isbn}: {e}")
         return None
 
+async def fetch_book_from_openbd(isbn: str) -> Optional[BookExternalInfo]:
+    """OpenBD APIから書籍情報を取得する。"""
+    try:
+        async with httpx.AsyncClient() as client:
+            url = f"https://api.openbd.jp/v1/get?isbn={isbn}"
+            response = await client.get(url)
+            logger.debug(f"OpenBD Status Code: {response.status_code}")
+            response.raise_for_status()
+            data = response.json()
 
+            if data and data[0] and data[0].get("onix") != None:
+                # 必要なデータ抽出
+                summary = data[0]["summary"]
+                onix = data[0]["onix"]
+                
+                title = summary.get("title")
+                authors = summary.get("author")
+                publisher = summary.get("publisher")
+                published_date_raw = summary.get("pubdate", "")
+                
+                published_date = published_date_raw
+                if len(published_date_raw) == 6:
+                    published_date = f"{published_date_raw[:4]}-{published_date_raw[4:]}"
+                elif len(published_date_raw) == 8:
+                    published_date = f"{published_date_raw[:4]}-{published_date_raw[4:6]}-{published_date_raw[6:]}"
+
+                cover_image_url = None
+                collateral_detail = onix.get("CollateralDetail")
+                if collateral_detail:
+                    supporting_resource = collateral_detail.get("SupportingResource")
+                    if supporting_resource and supporting_resource[0]["ResourceVersion"]:
+                        cover_image_url = supporting_resource[0]["ResourceVersion"][0].get("ResourceLink")
+
+                cost_int: Optional[int] = None
+                product_supply = onix.get("ProductSupply")
+                if product_supply:
+                    supply_detail = product_supply.get("SupplyDetail")
+                    if supply_detail and supply_detail.get("Price"):
+                        price = supply_detail["Price"][0]
+                        price_amount_raw = price.get("PriceAmount")
+                        if price_amount_raw:
+                            price_match = re.findall(r"\d+", str(price_amount_raw))
+                            if price_match:
+                                try:
+                                    cost_int = int(price_match[0])
+                                except ValueError:
+                                    logger.warning(f"OpenBD: Could not convert cost '{price_match[0]}' to int for ISBN {isbn}")
+                                    cost_int = None
+                
+                logger.info("OpenBD completed successfully.")
+                return BookExternalInfo(
+                    isbn=isbn,
+                    title=title,
+                    author=authors,
+                    publisher=publisher,
+                    publication_date=published_date,
+                    cover_image_url=cover_image_url,
+                    cost=cost_int,
+                )
+            else:
+                return None
+    except httpx.HTTPStatusError as e:
+        logger.error(f"OpenBD: HTTP error for ISBN {isbn}: Status={e.response.status_code}.")
+        return None
+    except Exception as e:
+        logger.error(f"OpenBD: Unexpected error for ISBN {isbn}: {e}")
+        return None
+
+BOOK_FIELDS = BookExternalInfo.model_fields.keys()
 async def get_book_info(isbn: str) -> Optional[BookExternalInfo]:
-    book = await fetch_book_from_google_books(isbn)
-    if book:
-        return book
-    book = await fetch_book_from_ndl(isbn)
-    if book:
-        return book
-    return None
+
+    fetchers: List[Callable[[str], Awaitable[Optional[BookExternalInfo]]]] = [
+        fetch_book_from_google_books,
+        fetch_book_from_openbd,
+        fetch_book_from_ndl
+    ]
+
+    final_data_dict: Dict[str, Any] = {"isbn": isbn}
+    
+    for fetcher in fetchers:
+        fetched_book = await fetcher(isbn)
+        
+        if fetched_book:
+            new_data = fetched_book.model_dump(exclude_none=True)
+
+            for key in BOOK_FIELDS:
+                if key not in final_data_dict and key in new_data:
+                    final_data_dict[key] = new_data[key]
+
+            if all(final_data_dict.get(field) for field in ["title", "author", "publisher", "cost"]):
+                 break
+        
+    if not final_data_dict.get("title"):
+        logger.info(f"ISBN {isbn}: Could not find essential information from any API.")
+        return None
+    
+    return BookExternalInfo(**final_data_dict)

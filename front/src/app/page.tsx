@@ -6,9 +6,41 @@ import type { Book } from "@/types/book";
 const BACKEND_BASE_URL =
   process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://127.0.0.1:8000";
 
-async function getBooks(): Promise<Book[]> {
+async function getSortedStore(): Promise<Book[]> {
   try {
-    const response = await fetch(`${BACKEND_BASE_URL}/books/`, {
+    const response = await fetch(`${BACKEND_BASE_URL}/books/store`, {
+      method: "GET",
+    });
+
+    if (!response.ok) {
+      throw new Error(`Backend responded with ${response.status}`);
+    }
+
+    return (await response.json()) as Book[]
+  } catch {
+    return [];
+  }
+}
+
+async function getSortedReserve(): Promise<Book[]> {
+  try {
+    const response = await fetch(`${BACKEND_BASE_URL}/books/reserve`, {
+      method: "GET",
+    });
+
+    if (!response.ok) {
+      throw new Error(`Backend responded with ${response.status}`);
+    }
+
+    return (await response.json()) as Book[]
+  } catch {
+    return [];
+  }
+}
+
+async function getSortedRead(): Promise<Book[]> {
+  try {
+    const response = await fetch(`${BACKEND_BASE_URL}/books/read`, {
       method: "GET",
     });
 
@@ -92,7 +124,9 @@ async function getCosts(): Promise<number> {
 }
 
 export default async function Home() {
-  const books = await getBooks();
+  const storeBooks = await getSortedStore();
+  const reserveBooks = await getSortedReserve();
+  const readBooks = await getSortedRead();
   const stores = await getStores();
   const newStores = await getNewStores();
   const newReads = await getNewReads();
@@ -105,9 +139,9 @@ export default async function Home() {
         
         <section className="space-y-6">
           <Graph values1={stores} values2={newStores} values3={newReads} cost={cost} />
-          <BookMenu prop="store" books={books} />
-          <BookMenu prop="reserve" books={books}/>
-          <BookMenu prop="read" books={books}/>
+          <BookMenu prop="store" books={storeBooks} />
+          <BookMenu prop="reserve" books={reserveBooks}/>
+          <BookMenu prop="read" books={readBooks}/>
         </section>
 
       </main>

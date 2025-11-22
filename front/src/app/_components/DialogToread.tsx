@@ -10,10 +10,10 @@ async function patchRead(book: Book): Promise<Book> {
   try {
     const response = await fetch(`${BACKEND_BASE_URL}/books/${book.id}/status`, {
       method: "PATCH",
-       headers: {
-         "Content-Type": "application/json",
-       },
-       body: JSON.stringify({ status: "read" },),
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ status: "read" },),
     });
 
     if (!response.ok) {

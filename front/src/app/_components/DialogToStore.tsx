@@ -10,10 +10,10 @@ async function patchStore(book: Book): Promise<Book> {
   try {
     const response = await fetch(`${BACKEND_BASE_URL}/books/${book.id}/status`, {
       method: "PATCH",
-       headers: {
-         "Content-Type": "application/json",
-       },
-       body: JSON.stringify({ status: "store" },),
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ status: "store" },),
     });
 
     if (!response.ok) {

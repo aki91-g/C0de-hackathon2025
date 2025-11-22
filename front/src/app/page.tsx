@@ -162,6 +162,7 @@ export default async function Home() {
             values2={newStores}
             values3={newReads}
             cost={cost}
+            reads={readBooks.length}
           />
           <BookMenu prop="store" books={storeBooks} />
           <BookMenu prop="reserve" books={reserveBooks} />

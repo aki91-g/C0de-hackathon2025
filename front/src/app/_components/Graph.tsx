@@ -42,6 +42,7 @@ type GraphProps = {
   values2: { date: string; value: number }[];
   values3: { date: string; value: number }[];
   cost: number;
+  reads: number;
 };
 
 // ---- メインコンポーネント ----
@@ -50,25 +51,30 @@ export default function WeekGraph({
   values2,
   values3,
   cost,
+  reads,
 }: GraphProps) {
   return (
     <div className="w-full max-w-2xl mx-auto mt-8">
-      <div className="h-64 flex justify-between py-4">
-        <div className="w-1/2">
+        <div>
           <h1 className="text-4xl font-bold mb-6 text-center">現在の積読量</h1>
           <h1 className="text-8xl font-bold mb-6 text-center text-red-600">
             {values1.length > 0 ? values1[values1.length - 1].value : 0}冊
           </h1>
         </div>
-        <div className="w-1/2 py-4">
+        <div className="py-4">
           <h1 className="text-4xl font-bold mb-6 text-center">
             現在の積読総額
           </h1>
-          <h1 className="text-6xl font-bold mb-6 text-center text-red-600">
+          <h1 className="text-7xl font-bold mb-6 text-center text-red-600">
             {cost}円
           </h1>
         </div>
-      </div>
+        <div className="py-4">
+          <h1 className="text-4xl font-bold mb-6 text-center">読了本</h1>
+          <h1 className="text-8xl font-bold mb-6 text-center text-blue-700">
+            {reads}冊
+          </h1>
+        </div>
       <h1 className="text-2xl font-bold mb-6 text-left">積読グラフ</h1>
 
       <Tabs defaultValue="total" className="w-full">

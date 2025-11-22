@@ -46,3 +46,4 @@ class BookExternalInfo(BaseModel):
     publisher: Optional[str] = None
     publication_date: Optional[str] = None
     cover_image_url: Optional[str] = None
+    cost: int =0

@@ -37,6 +37,7 @@ async def fetch_book_from_google_books(isbn: str) -> Optional[BookExternalInfo]:
                 cover_image_url = image_links.get("thumbnail") if image_links else None
 
 
+                print("Google completed")
                 return BookExternalInfo(
                     isbn=isbn,
                     title=title,
@@ -86,7 +87,8 @@ def _map_ndl_data(isbn: str, xml_content) -> Optional[BookExternalInfo]:
             author=author_str,
             publisher=publisher_element.text if publisher_element is not None else 'unknown publisher',
             publication_date=published_date,
-            source="NDL Search"
+            source="NDL Search",
+            cost = 0
         )
     
     except ET.ParseError as e:
@@ -170,7 +172,7 @@ async def fetch_book_from_openbd(isbn: str) -> Optional[BookExternalInfo]:
                 price_amount = price[0].get("PriceAmount") if price else None
                 cost = re.findall(r"\d+", price_amount)
 
-                print(price)
+                print("openBD completed")
                 return BookExternalInfo(
                     isbn=isbn,
                     title=title,
@@ -192,13 +194,30 @@ async def fetch_book_from_openbd(isbn: str) -> Optional[BookExternalInfo]:
 
 
 async def get_book_info(isbn: str) -> Optional[BookExternalInfo]:
-    book = await fetch_book_from_openbd(isbn)
-    if book:
-        return book
-    book = await fetch_book_from_ndl(isbn)
-    if book:
-        return book
-    book = await fetch_book_from_google_books(isbn)
-    if book:
-        return book
-    return None
+    fetch = [fetch_book_from_google_books,fetch_book_from_openbd,fetch_book_from_ndl]
+    book = None
+    count = 0
+    while book == None and count < len(fetch):
+        book = await fetch[count](isbn)
+        count += 1
+    while count < len(fetch):
+        checker = book.check()
+        if checker == None:
+            count = len(fetch)
+        else:
+            book_a = await fetch[count](isbn)
+            if book_a != None:
+                if checker[0] == 1:
+                    book.set_title(book_a.get_title())
+                if checker[1] == 1:
+                    book.set_author(book_a.get_author())
+                if checker[2] == 1:
+                    book.set_publisher(book_a.get_publisher())
+                if checker[3] == 1:
+                    book.set_publication_date(book_a.get_publication_date())
+                if checker[4] == 1:
+                    book.set_cover_image_url(book_a.get_cover_image_url())
+                if checker[5] == 1:
+                    book.set_cost(book_a.get_cost())
+            count += 1
+    return book

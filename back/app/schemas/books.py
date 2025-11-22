@@ -46,3 +46,48 @@ class BookExternalInfo(BaseModel):
     publication_date: Optional[str] = None
     cover_image_url: Optional[str] = None
     cost: int
+
+    def set_title(self,title):
+        self.title = title
+    def set_author(self,author):
+        self.author = author
+    def set_publisher(self,publisher):
+        self.publisher = publisher
+    def set_publication_date(self,publication_date):
+        self.publication_date = publication_date
+    def set_cover_image_url(self,cover_image_url):
+        self.cover_image_url = cover_image_url
+    def set_cost(self,cost):
+        self.cost = cost
+    def get_title(self,):
+        return self.title
+    def get_author(self):
+        return self.author
+    def get_publisher(self):
+        return self.publisher
+    def get_publication_date(self):
+        return self.publication_date
+    def get_cover_image_url(self):
+        return self.cover_image_url
+    def get_cost(self):
+        return self.cost
+    
+    def check(self) -> Optional[list]:
+        checker = [0]*6
+        if self.title == "":
+            checker[0] = 1
+        if self.author == "":
+            checker[1] = 1
+        if self.publisher == None:
+            checker[2] = 1
+        if self.publication_date == None:
+            checker[3] = 1
+        if self.cover_image_url == None:
+            checker[4] = 1
+        if self.cost == 0:
+            checker[5] = 1
+        
+        for i in checker:
+            if i == 1:
+                return checker
+        return None

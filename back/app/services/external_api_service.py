@@ -85,7 +85,6 @@ def _map_ndl_data(isbn: str, xml_content) -> Optional[BookExternalInfo]:
             author=author_str,
             publisher=publisher_element.text if publisher_element is not None else 'unknown publisher',
             publication_date=published_date,
-            source="NDL Search"
         )
     
     except ET.ParseError as e:
@@ -189,7 +188,6 @@ async def fetch_book_from_openbd(isbn: str) -> Optional[BookExternalInfo]:
                     author=authors,
                     publisher=publisher,
                     publication_date=published_date,
-                    cover_image_url=cover_image_url,
                     cost=cost_int,
                 )
             else:

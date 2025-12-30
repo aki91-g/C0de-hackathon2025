@@ -1,31 +1,73 @@
-## C0deハッカソン
+# 済読
+**C0deハッカソン Human Intelligence Award 受賞作品 (2025年10月)**
 
-Next.js 16 + TypeScript（`front/`）と FastAPI（`back/`）で構成されたシンプルな
-フルスタック構成です。両者を同時に起動するとフロントエンドがサーバーコンポーネントから
+## 主な機能
+* **自動書籍情報取得:** Google Books APIと連携し、ISBN入力のみで書名、著者、表紙画像などを自動補完。
+* **RESTful APIアーキテクチャ:** CRUD操作、外部API連携、ステータス管理を分離したメンテナビリティの高いバックエンド設計。
+* **高速なUI/UX:** Next.js 15のサーバーコンポーネントとFastAPIを組み合わせた、低レイテンシなデータ表示。
+* **型安全なデータフロー:** Pydantic（Backend）とTypeScript（Frontend）による、エンドツーエンドの型定義。
+
+## 🛠 技術スタック
+| カテゴリ | 使用技術 |
+| :--- | :--- |
+| **Frontend** | Next.js 15, TypeScript, Tailwind CSS, pnpm |
+| **Backend** | FastAPI, Uvicorn, Pydantic, uv |
+| **Database** | PostgreSQL |
+| **API** | Google Books API |
+
+## Screenshots & Demo
+### Main Interface
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/9ad3e211-a740-4844-b929-f9f8d2b28bd2" width="90%" alt="Main Dashboard">
+</p>
+
+### Features
+| Feature Analysis | User Interaction |
+| :---: | :---: |
+| <img src="https://github.com/user-attachments/assets/c691aea7-e5f7-4e62-b721-d2f8adbe2aa7" width="100%"> | <img src="https://github.com/user-attachments/assets/83c18d2f-6bcb-4b65-8fc2-2404aa95743a" width="100%"> |
+| <img src="https://github.com/user-attachments/assets/e8011a76-e816-4cc6-9cc9-842c6236808d" width="100%"> | <img src="https://github.com/user-attachments/assets/b46e2b4d-c1fc-4d38-9da6-92a6bf283c40" width="100%"> |
+
+### Detail Views
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/644c0448-7b9c-4709-8bdf-73c034fc6083" width="30%">
+  <img src="https://github.com/user-attachments/assets/30aa40a9-eb7c-456a-be76-d0319aadb1d6" width="30%">
+  <img src="https://github.com/user-attachments/assets/41e02f0e-8f60-4762-bf72-6bdab7f18a1c" width="30%">
+</p>
+
+### System Workflow / Data Flow
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/6fe4b931-872e-4bfe-9ad2-a5403c9342b6" width="45%">
+  <img src="https://github.com/user-attachments/assets/c6e3b71c-3fe9-4a10-b257-3be9d87fdd9d" width="45%">
+</p>
+
+## システム構成・ディレクトリ構造(バックエンド)
+
+```
+back/
+├── api/routers/      # APIエンドポイント定義（CRUD、外部API連携など）
+├── app/              # ビジネスロジック
+│   ├── schemas/      # Pydanticによるデータモデル定義
+│   └── services/     # DB操作や外部API呼び出しの具体的な処理
+└── database/         # DB接続設定およびSQLAlchemyモデル
+```
+
+## ローカル起動方法
+Next.js 16 + TypeScript（`front/`）と FastAPI（`back/`）で構成されたシンプルなフルスタック構成です。両者を同時に起動するとフロントエンドがサーバーコンポーネントから
 バックエンドの REST API を叩き、取得したメッセージを画面へ表示します。
 
 ### Backend
-
 ```bash
 cd back
 uv sync  # もしくは `pip install -r requirements.txt`
 uv run python main.py  # http://127.0.0.1:8000 で FastAPI が立ち上がります
 ```
-
-エンドポイント:
-
-- `GET /api/health` : ヘルスチェック
-- `GET /api/greeting?name=YOUR_NAME` : フロントエンドが利用するメッセージ API
-- `POST /api/books/search` : ISBN を JSON (`{"isbn": "978-4-04-102622-5"}` など) で渡すと
-  Google Books API を経由してリアルタイムに書誌情報を返却
-
+エンドポイントを確認したい場合は、backのREADMEまたは、FastAPIのドキュメントを参照してください。
 ポートを変更したい場合は `BACKEND_PORT` 環境変数を設定してください。
 
 #### Google Books APIの設定
 
 - `GOOGLE_BOOKS_API_URL` : デフォルトは `https://www.googleapis.com/books/v1/volumes`
-- `GOOGLE_BOOKS_API_KEY` : 未設定でも動作しますが、独自の API キーを設定すると
-  レート制限に余裕ができます
+- `GOOGLE_BOOKS_API_KEY` : 未設定でも動作しますが、独自の API キーを設定するとレート制限に余裕ができます
 
 ### Frontend
 
